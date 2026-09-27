@@ -1,0 +1,959 @@
+{smcl}
+{com}{sf}{ul off}{txt}{.-}
+      name:  {res}<unnamed>
+       {txt}log:  {res}C:\Users\33841\Desktop\project2_fdi_industry\output/stata_log.smcl
+  {txt}log type:  {res}smcl
+ {txt}opened on:  {res}27 Sep 2026, 23:31:25
+{txt}
+{com}. 
+. disp ""
+{res}
+{txt}
+{com}. disp "=============================================================================="
+{res}==============================================================================
+{txt}
+{com}. disp "  项目二：FDI对中国产业结构升级的影响研究"
+{res}  项目二：FDI对中国产业结构升级的影响研究
+{txt}
+{com}. disp "  Project 2: FDI and Industrial Structure Upgrading"
+{res}  Project 2: FDI and Industrial Structure Upgrading
+{txt}
+{com}. disp "  (基于省际面板数据 / Provincial Panel Data)"
+{res}  (基于省际面板数据 / Provincial Panel Data)
+{txt}
+{com}. disp "=============================================================================="
+{res}==============================================================================
+{txt}
+{com}. disp ""
+{res}
+{txt}
+{com}. disp "当前工作目录: `c(pwd)'"
+{res}当前工作目录: C:\Users\33841\Desktop\project2_fdi_industry
+{txt}
+{com}. disp ""
+{res}
+{txt}
+{com}. 
+. * 检查estout
+. capture which esttab
+{txt}
+{com}. if _rc != 0 {c -(}
+.     disp "正在安装 estout 包..."
+.     ssc install estout, replace
+. {c )-}
+{txt}
+{com}. 
+. * ---- 1. 导入数据与面板设置 ----
+. disp "Step 1: 导入清洗后数据（由01_data_preparation.do生成）"
+{res}Step 1: 导入清洗后数据（由01_data_preparation.do生成）
+{txt}
+{com}. disp ""
+{res}
+{txt}
+{com}. 
+. * 使用Stata格式数据（由01_data_preparation.do生成）
+. use "data/fdi_panel_data_clean.dta", clear
+{txt}
+{com}. 
+. * 面板数据结构已在01_data_preparation.do中设置，此处确认
+. xtset prov_id year
+{res}
+{col 1}{txt:Panel variable: }{res:prov_id}{txt: (strongly balanced)}
+{p 1 16 2}{txt:Time variable: }{res:year}{txt:, }{res:{bind:2010}}{txt: to }{res:{bind:2022}}{p_end}
+{txt}{col 10}Delta: {res}1 unit
+{txt}
+{com}. 
+. disp "  面板数据设置完成！"
+{res}  面板数据设置完成！
+{txt}
+{com}. xtdescribe
+
+ {txt}prov_id:  {res}1{txt}, {res}2{txt}, ..., {res}31                                     {txt}n ={res}         31
+    {txt}year:  {res}2010, 2011, ..., 2022                             {txt}T ={res}         13
+           {txt}Delta(year) = {res}1 unit
+           {txt}Span(year)  = {res}13 periods
+           {txt}(prov_id*year uniquely identifies each observation)
+
+Distribution of T_i:   min      5%     25%       50%       75%     95%     max
+                    {res}    13      13      13        13        13      13      13
+
+{txt}{col 6}Freq.  Percent    Cum. {c |}  Pattern
+ {hline 27}{c +}{c -}{c -}{hline 13}
+{res}       31    100.00  100.00{txt} {c |}  {res}1111111111111
+{txt} {hline 27}{c +}{c -}{c -}{hline 13}
+{res}       31    100.00        {txt} {c |}  {res}XXXXXXXXXXXXX
+{txt}
+{com}. disp ""
+{res}
+{txt}
+{com}. 
+. * ---- 2. 描述性统计 ----
+. disp "=============================================================================="
+{res}==============================================================================
+{txt}
+{com}. disp "  Step 2: 描述性统计 / Descriptive Statistics"
+{res}  Step 2: 描述性统计 / Descriptive Statistics
+{txt}
+{com}. disp "=============================================================================="
+{res}==============================================================================
+{txt}
+{com}. disp ""
+{res}
+{txt}
+{com}. 
+. summarize ts_ratio fdi pgdp human_cap gov_exp openness infra urban
+
+{txt}    Variable {c |}        Obs        Mean    Std. dev.       Min        Max
+{hline 13}{c +}{hline 57}
+{space 4}ts_ratio {c |}{res}        403    1.526589    .3694827      .8232      2.521
+{txt}{space 9}fdi {c |}{res}        403    261.3292    104.7431      88.83     551.26
+{txt}{space 8}pgdp {c |}{res}        403    94447.94     32119.5      38453     185072
+{txt}{space 3}human_cap {c |}{res}        403    10.18973    .8986937       8.51      12.15
+{txt}{space 5}gov_exp {c |}{res}        403    19.34667     3.20928      13.49      26.59
+{txt}{hline 13}{c +}{hline 57}
+{space 4}openness {c |}{res}        403     66.3962    21.71492       34.6     127.36
+{txt}{space 7}infra {c |}{res}        403    111.2062    33.54091      49.42     180.29
+{txt}{space 7}urban {c |}{res}        403     71.7903    13.22324      48.06         95
+{txt}
+{com}. 
+. estpost summarize ts_ratio fdi pgdp human_cap gov_exp openness infra urban
+
+{txt}{space 0}{space 0}{ralign 12:}{space 1}{c |}{space 1}{ralign 9:e(count)}{space 1}{space 1}{ralign 9:e(sum_w)}{space 1}{space 1}{ralign 9:e(mean)}{space 1}{space 1}{ralign 9:e(Var)}{space 1}{space 1}{ralign 9:e(sd)}{space 1}{space 1}{ralign 9:e(min)}{space 1}{space 1}{ralign 9:e(max)}{space 1}{space 1}{ralign 9:e(sum)}{space 1}
+{space 0}{hline 13}{c   +}{hline 11}{hline 11}{hline 11}{hline 11}{hline 11}{hline 11}{hline 11}{hline 11}
+{space 0}{space 0}{ralign 12:ts_ratio}{space 1}{c |}{space 1}{ralign 9:{res:{sf:      403}}}{space 1}{space 1}{ralign 9:{res:{sf:      403}}}{space 1}{space 1}{ralign 9:{res:{sf: 1.526589}}}{space 1}{space 1}{ralign 9:{res:{sf: .1365175}}}{space 1}{space 1}{ralign 9:{res:{sf: .3694827}}}{space 1}{space 1}{ralign 9:{res:{sf:    .8232}}}{space 1}{space 1}{ralign 9:{res:{sf:    2.521}}}{space 1}{space 1}{ralign 9:{res:{sf: 615.2154}}}{space 1}
+{space 0}{space 0}{ralign 12:fdi}{space 1}{c |}{space 1}{ralign 9:{res:{sf:      403}}}{space 1}{space 1}{ralign 9:{res:{sf:      403}}}{space 1}{space 1}{ralign 9:{res:{sf: 261.3292}}}{space 1}{space 1}{ralign 9:{res:{sf: 10971.11}}}{space 1}{space 1}{ralign 9:{res:{sf: 104.7431}}}{space 1}{space 1}{ralign 9:{res:{sf:    88.83}}}{space 1}{space 1}{ralign 9:{res:{sf:   551.26}}}{space 1}{space 1}{ralign 9:{res:{sf: 105315.7}}}{space 1}
+{space 0}{space 0}{ralign 12:pgdp}{space 1}{c |}{space 1}{ralign 9:{res:{sf:      403}}}{space 1}{space 1}{ralign 9:{res:{sf:      403}}}{space 1}{space 1}{ralign 9:{res:{sf: 94447.94}}}{space 1}{space 1}{ralign 9:{res:{sf: 1.03e+09}}}{space 1}{space 1}{ralign 9:{res:{sf:  32119.5}}}{space 1}{space 1}{ralign 9:{res:{sf:    38453}}}{space 1}{space 1}{ralign 9:{res:{sf:   185072}}}{space 1}{space 1}{ralign 9:{res:{sf: 3.81e+07}}}{space 1}
+{space 0}{space 0}{ralign 12:human_cap}{space 1}{c |}{space 1}{ralign 9:{res:{sf:      403}}}{space 1}{space 1}{ralign 9:{res:{sf:      403}}}{space 1}{space 1}{ralign 9:{res:{sf: 10.18973}}}{space 1}{space 1}{ralign 9:{res:{sf: .8076504}}}{space 1}{space 1}{ralign 9:{res:{sf: .8986937}}}{space 1}{space 1}{ralign 9:{res:{sf:     8.51}}}{space 1}{space 1}{ralign 9:{res:{sf:    12.15}}}{space 1}{space 1}{ralign 9:{res:{sf:  4106.46}}}{space 1}
+{space 0}{space 0}{ralign 12:gov_exp}{space 1}{c |}{space 1}{ralign 9:{res:{sf:      403}}}{space 1}{space 1}{ralign 9:{res:{sf:      403}}}{space 1}{space 1}{ralign 9:{res:{sf: 19.34667}}}{space 1}{space 1}{ralign 9:{res:{sf: 10.29948}}}{space 1}{space 1}{ralign 9:{res:{sf:  3.20928}}}{space 1}{space 1}{ralign 9:{res:{sf:    13.49}}}{space 1}{space 1}{ralign 9:{res:{sf:    26.59}}}{space 1}{space 1}{ralign 9:{res:{sf:  7796.71}}}{space 1}
+{space 0}{space 0}{ralign 12:openness}{space 1}{c |}{space 1}{ralign 9:{res:{sf:      403}}}{space 1}{space 1}{ralign 9:{res:{sf:      403}}}{space 1}{space 1}{ralign 9:{res:{sf:  66.3962}}}{space 1}{space 1}{ralign 9:{res:{sf: 471.5376}}}{space 1}{space 1}{ralign 9:{res:{sf: 21.71492}}}{space 1}{space 1}{ralign 9:{res:{sf:     34.6}}}{space 1}{space 1}{ralign 9:{res:{sf:   127.36}}}{space 1}{space 1}{ralign 9:{res:{sf: 26757.67}}}{space 1}
+{space 0}{space 0}{ralign 12:infra}{space 1}{c |}{space 1}{ralign 9:{res:{sf:      403}}}{space 1}{space 1}{ralign 9:{res:{sf:      403}}}{space 1}{space 1}{ralign 9:{res:{sf: 111.2062}}}{space 1}{space 1}{ralign 9:{res:{sf: 1124.993}}}{space 1}{space 1}{ralign 9:{res:{sf: 33.54091}}}{space 1}{space 1}{ralign 9:{res:{sf:    49.42}}}{space 1}{space 1}{ralign 9:{res:{sf:   180.29}}}{space 1}{space 1}{ralign 9:{res:{sf: 44816.08}}}{space 1}
+{space 0}{space 0}{ralign 12:urban}{space 1}{c |}{space 1}{ralign 9:{res:{sf:      403}}}{space 1}{space 1}{ralign 9:{res:{sf:      403}}}{space 1}{space 1}{ralign 9:{res:{sf:  71.7903}}}{space 1}{space 1}{ralign 9:{res:{sf:  174.854}}}{space 1}{space 1}{ralign 9:{res:{sf: 13.22324}}}{space 1}{space 1}{ralign 9:{res:{sf:    48.06}}}{space 1}{space 1}{ralign 9:{res:{sf:       95}}}{space 1}{space 1}{ralign 9:{res:{sf: 28931.49}}}{space 1}
+
+{com}. esttab using "output/tables/table1_descriptive_stats.rtf", ///
+>     cells("count mean sd min p50 max") ///
+>     title("表1 主要变量描述性统计") ///
+>     alignment(center) replace
+{res}{txt}(output written to {browse  `"output/tables/table1_descriptive_stats.rtf"'})
+
+{com}. 
+. disp "  描述性统计表已保存"
+{res}  描述性统计表已保存
+{txt}
+{com}. disp ""
+{res}
+{txt}
+{com}. 
+. * ---- 3. 基准回归 ----
+. disp "=============================================================================="
+{res}==============================================================================
+{txt}
+{com}. disp "  Step 3: 基准回归 / Baseline Regression"
+{res}  Step 3: 基准回归 / Baseline Regression
+{txt}
+{com}. disp "=============================================================================="
+{res}==============================================================================
+{txt}
+{com}. disp ""
+{res}
+{txt}
+{com}. 
+. * 模型1：混合OLS (Pooled OLS)
+. disp "模型1：混合OLS (Pooled OLS)"
+{res}模型1：混合OLS (Pooled OLS)
+{txt}
+{com}. reg ts_ratio fdi pgdp human_cap gov_exp openness infra urban
+
+{txt}      Source {c |}       SS           df       MS      Number of obs   ={res}       403
+{txt}{hline 13}{c +}{hline 34}   F(7, 395)       = {res}   463.42
+{txt}       Model {c |} {res} 48.9228695         7  6.98898136   {txt}Prob > F        ={res}    0.0000
+{txt}    Residual {c |} {res} 5.95716003       395  .015081418   {txt}R-squared       ={res}    0.8915
+{txt}{hline 13}{c +}{hline 34}   Adj R-squared   ={res}    0.8895
+{txt}       Total {c |} {res} 54.8800295       402  .136517486   {txt}Root MSE        =   {res} .12281
+
+{txt}{hline 13}{c TT}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{col 1}    ts_ratio{col 14}{c |} Coefficient{col 26}  Std. err.{col 38}      t{col 46}   P>|t|{col 54}     [95% con{col 67}f. interval]
+{hline 13}{c +}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{space 9}fdi {c |}{col 14}{res}{space 2} .0006544{col 26}{space 2} .0001929{col 37}{space 1}    3.39{col 46}{space 3}0.001{col 54}{space 4} .0002752{col 67}{space 3} .0010336
+{txt}{space 8}pgdp {c |}{col 14}{res}{space 2} 7.23e-06{col 26}{space 2} 6.91e-07{col 37}{space 1}   10.46{col 46}{space 3}0.000{col 54}{space 4} 5.87e-06{col 67}{space 3} 8.59e-06
+{txt}{space 3}human_cap {c |}{col 14}{res}{space 2} .1022087{col 26}{space 2} .0279899{col 37}{space 1}    3.65{col 46}{space 3}0.000{col 54}{space 4}  .047181{col 67}{space 3} .1572364
+{txt}{space 5}gov_exp {c |}{col 14}{res}{space 2} .0032529{col 26}{space 2} .0037241{col 37}{space 1}    0.87{col 46}{space 3}0.383{col 54}{space 4}-.0040686{col 67}{space 3} .0105743
+{txt}{space 4}openness {c |}{col 14}{res}{space 2}-.0036146{col 26}{space 2} .0006679{col 37}{space 1}   -5.41{col 46}{space 3}0.000{col 54}{space 4}-.0049278{col 67}{space 3}-.0023015
+{txt}{space 7}infra {c |}{col 14}{res}{space 2} .0035471{col 26}{space 2} .0010341{col 37}{space 1}    3.43{col 46}{space 3}0.001{col 54}{space 4}  .001514{col 67}{space 3} .0055801
+{txt}{space 7}urban {c |}{col 14}{res}{space 2}-.0074362{col 26}{space 2} .0024643{col 37}{space 1}   -3.02{col 46}{space 3}0.003{col 54}{space 4}-.0122811{col 67}{space 3}-.0025914
+{txt}{space 7}_cons {c |}{col 14}{res}{space 2}  -.05205{col 26}{space 2} .1996017{col 37}{space 1}   -0.26{col 46}{space 3}0.794{col 54}{space 4}-.4444645{col 67}{space 3} .3403646
+{txt}{hline 13}{c BT}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{res}{txt}
+{com}. estimates store pool
+{txt}
+{com}. 
+. * 模型2：固定效应 (Fixed Effects)
+. disp ""
+{res}
+{txt}
+{com}. disp "模型2：固定效应模型 (Fixed Effects Model)"
+{res}模型2：固定效应模型 (Fixed Effects Model)
+{txt}
+{com}. xtreg ts_ratio fdi pgdp human_cap gov_exp openness infra urban, fe
+{res}
+{txt}Fixed-effects (within) regression{col 49}Number of obs{col 67}={col 69}{res}       403
+{txt}Group variable: {res}prov_id{txt}{col 49}Number of groups{col 67}={col 69}{res}        31
+
+{txt}R-squared:{col 49}Obs per group:
+     Within  = {res}0.9012{col 63}{txt}min{col 67}={col 69}{res}        13
+{txt}     Between = {res}0.8865{col 63}{txt}avg{col 67}={col 69}{res}      13.0
+{txt}     Overall = {res}0.8528{col 63}{txt}max{col 67}={col 69}{res}        13
+
+{txt}{col 49}F({res}7{txt}, {res}365{txt}){col 67}={col 70}{res}   475.83
+{txt}corr(u_i, Xb) = {res}-0.8013{txt}{col 49}Prob > F{col 67}={col 73}{res}0.0000
+
+{txt}{hline 13}{c TT}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{col 1}    ts_ratio{col 14}{c |} Coefficient{col 26}  Std. err.{col 38}      t{col 46}   P>|t|{col 54}     [95% con{col 67}f. interval]
+{hline 13}{c +}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{space 9}fdi {c |}{col 14}{res}{space 2} .0007512{col 26}{space 2} .0001486{col 37}{space 1}    5.05{col 46}{space 3}0.000{col 54}{space 4} .0004589{col 67}{space 3} .0010434
+{txt}{space 8}pgdp {c |}{col 14}{res}{space 2} 3.53e-06{col 26}{space 2} 6.13e-07{col 37}{space 1}    5.76{col 46}{space 3}0.000{col 54}{space 4} 2.33e-06{col 67}{space 3} 4.74e-06
+{txt}{space 3}human_cap {c |}{col 14}{res}{space 2} .0321376{col 26}{space 2} .0363821{col 37}{space 1}    0.88{col 46}{space 3}0.378{col 54}{space 4}-.0394073{col 67}{space 3} .1036825
+{txt}{space 5}gov_exp {c |}{col 14}{res}{space 2} .0033269{col 26}{space 2} .0046618{col 37}{space 1}    0.71{col 46}{space 3}0.476{col 54}{space 4}-.0058405{col 67}{space 3} .0124942
+{txt}{space 4}openness {c |}{col 14}{res}{space 2}  .000755{col 26}{space 2} .0006378{col 37}{space 1}    1.18{col 46}{space 3}0.237{col 54}{space 4}-.0004992{col 67}{space 3} .0020092
+{txt}{space 7}infra {c |}{col 14}{res}{space 2} .0056586{col 26}{space 2} .0014634{col 37}{space 1}    3.87{col 46}{space 3}0.000{col 54}{space 4} .0027809{col 67}{space 3} .0085363
+{txt}{space 7}urban {c |}{col 14}{res}{space 2} .0062911{col 26}{space 2} .0040704{col 37}{space 1}    1.55{col 46}{space 3}0.123{col 54}{space 4}-.0017133{col 67}{space 3} .0142955
+{txt}{space 7}_cons {c |}{col 14}{res}{space 2}-.5263389{col 26}{space 2} .3010571{col 37}{space 1}   -1.75{col 46}{space 3}0.081{col 54}{space 4}-1.118363{col 67}{space 3} .0656852
+{txt}{hline 13}{c +}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+     sigma_u {c |} {res} .21203915
+     {txt}sigma_e {c |} {res}  .0703187
+         {txt}rho {c |} {res} .90091799{txt}   (fraction of variance due to u_i)
+{hline 13}{c BT}{hline 64}
+F test that all u_i=0: F({res}30{txt}, {res}365{txt}) = {res}27.99{col 62}{txt}Prob > F = {res}0.0000
+{txt}
+{com}. estimates store fe
+{txt}
+{com}. 
+. * 模型3：随机效应 (Random Effects)
+. disp ""
+{res}
+{txt}
+{com}. disp "模型3：随机效应模型 (Random Effects Model)"
+{res}模型3：随机效应模型 (Random Effects Model)
+{txt}
+{com}. xtreg ts_ratio fdi pgdp human_cap gov_exp openness infra urban, re
+{res}
+{txt}Random-effects GLS regression                   Number of obs     = {res}       403
+{txt}Group variable: {res}prov_id                         {txt}Number of groups  = {res}        31
+
+{txt}R-squared:                                      Obs per group:
+     Within  = {res}0.8961                                         {txt}min = {res}        13
+{txt}     Between = {res}0.8903                                         {txt}avg = {res}      13.0
+{txt}     Overall = {res}0.8750                                         {txt}max = {res}        13
+
+                                                {txt}Wald chi2({res}7{txt})      =  {res}  3164.97
+{txt}corr(u_i, X) = {res}0{txt} (assumed)                      Prob > chi2       =     {res}0.0000
+
+{txt}{hline 13}{c TT}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{col 1}    ts_ratio{col 14}{c |} Coefficient{col 26}  Std. err.{col 38}      z{col 46}   P>|z|{col 54}     [95% con{col 67}f. interval]
+{hline 13}{c +}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{space 9}fdi {c |}{col 14}{res}{space 2} .0006746{col 26}{space 2} .0001535{col 37}{space 1}    4.40{col 46}{space 3}0.000{col 54}{space 4} .0003738{col 67}{space 3} .0009755
+{txt}{space 8}pgdp {c |}{col 14}{res}{space 2} 4.98e-06{col 26}{space 2} 6.00e-07{col 37}{space 1}    8.30{col 46}{space 3}0.000{col 54}{space 4} 3.80e-06{col 67}{space 3} 6.15e-06
+{txt}{space 3}human_cap {c |}{col 14}{res}{space 2} .0168165{col 26}{space 2} .0354982{col 37}{space 1}    0.47{col 46}{space 3}0.636{col 54}{space 4}-.0527587{col 67}{space 3} .0863918
+{txt}{space 5}gov_exp {c |}{col 14}{res}{space 2}-.0015424{col 26}{space 2} .0045411{col 37}{space 1}   -0.34{col 46}{space 3}0.734{col 54}{space 4}-.0104428{col 67}{space 3}  .007358
+{txt}{space 4}openness {c |}{col 14}{res}{space 2}-.0011108{col 26}{space 2} .0005988{col 37}{space 1}   -1.86{col 46}{space 3}0.064{col 54}{space 4}-.0022843{col 67}{space 3} .0000628
+{txt}{space 7}infra {c |}{col 14}{res}{space 2} .0068838{col 26}{space 2} .0013864{col 37}{space 1}    4.97{col 46}{space 3}0.000{col 54}{space 4} .0041664{col 67}{space 3} .0096011
+{txt}{space 7}urban {c |}{col 14}{res}{space 2} -.001324{col 26}{space 2} .0037357{col 37}{space 1}   -0.35{col 46}{space 3}0.723{col 54}{space 4}-.0086458{col 67}{space 3} .0059977
+{txt}{space 7}_cons {c |}{col 14}{res}{space 2} .1420295{col 26}{space 2} .2724589{col 37}{space 1}    0.52{col 46}{space 3}0.602{col 54}{space 4}-.3919801{col 67}{space 3} .6760392
+{txt}{hline 13}{c +}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+     sigma_u {c |} {res} .10632509
+     {txt}sigma_e {c |} {res}  .0703187
+         {txt}rho {c |} {res} .69570479{txt}   (fraction of variance due to u_i)
+{hline 13}{c BT}{hline 64}
+
+{com}. estimates store re
+{txt}
+{com}. 
+. * 输出基准回归结果表
+. esttab pool fe re using "output/tables/table2_baseline_regression.rtf", ///
+>     se star(* 0.1 ** 0.05 *** 0.01) ///
+>     title("表2 FDI对产业结构升级影响的基准回归结果") ///
+>     mtitle("混合OLS" "固定效应" "随机效应") ///
+>     stats(r2 r2_a N, labels("R-squared" "Adj R-squared" "Observations")) ///
+>     alignment(center) replace
+{res}{txt}(output written to {browse  `"output/tables/table2_baseline_regression.rtf"'})
+
+{com}. 
+. disp ""
+{res}
+{txt}
+{com}. disp "  基准回归结果表已保存"
+{res}  基准回归结果表已保存
+{txt}
+{com}. disp ""
+{res}
+{txt}
+{com}. 
+. * ---- 4. Hausman检验 ----
+. disp "=============================================================================="
+{res}==============================================================================
+{txt}
+{com}. disp "  Step 4: Hausman检验 / Hausman Test"
+{res}  Step 4: Hausman检验 / Hausman Test
+{txt}
+{com}. disp "=============================================================================="
+{res}==============================================================================
+{txt}
+{com}. disp ""
+{res}
+{txt}
+{com}. 
+. disp "原假设 H0: 随机效应模型更有效 (Random effects model is efficient)"
+{res}原假设 H0: 随机效应模型更有效 (Random effects model is efficient)
+{txt}
+{com}. disp "备择假设 H1: 固定效应模型更一致 (Fixed effects model is consistent)"
+{res}备择假设 H1: 固定效应模型更一致 (Fixed effects model is consistent)
+{txt}
+{com}. disp ""
+{res}
+{txt}
+{com}. 
+. quietly xtreg ts_ratio fdi pgdp human_cap gov_exp openness infra urban, fe
+{txt}
+{com}. estimates store fe_test
+{txt}
+{com}. quietly xtreg ts_ratio fdi pgdp human_cap gov_exp openness infra urban, re
+{txt}
+{com}. estimates store re_test
+{txt}
+{com}. 
+. hausman fe_test re_test
+
+{txt}{p 0 8}Note: the rank of the differenced variance matrix ({result:6}) does not equal the number of coefficients being tested ({result:7}); be sure this is what you expect, or there may be problems computing the test.  Examine the output of your estimators for anything unexpected and possibly consider scaling your variables so that the coefficients are on a similar scale.
+
+{col 18}{hline 4} Coefficients {hline 4}
+{col 14}{c |}{col 21}(b){col 34}(B){col 49}(b-B){col 59}sqrt(diag(V_b-V_B))
+{col 14}{c |}{col 17}  fe_test   {col 30}  re_test   {col 46}Difference{col 63}Std. err.
+{hline 13}{c +}{hline 64}
+{space 9}fdi {c |}{res}{col 18} .0007512{col 31} .0006746{col 47} .0000765{col 63}        .
+{txt}{space 8}pgdp {c |}{res}{col 18} 3.53e-06{col 31} 4.98e-06{col 47}-1.44e-06{col 63} 1.28e-07
+{txt}{space 3}human_cap {c |}{res}{col 18} .0321376{col 31} .0168165{col 47}  .015321{col 63}  .007971
+{txt}{space 5}gov_exp {c |}{res}{col 18} .0033269{col 31}-.0015424{col 47} .0048693{col 63} .0010539
+{txt}{space 4}openness {c |}{res}{col 18}  .000755{col 31}-.0011108{col 47} .0018658{col 63} .0002196
+{txt}{space 7}infra {c |}{res}{col 18} .0056586{col 31} .0068838{col 47}-.0012251{col 63} .0004683
+{txt}{space 7}urban {c |}{res}{col 18} .0062911{col 31} -.001324{col 47} .0076152{col 63} .0016165
+{txt}{hline 13}{c BT}{hline 64}
+{ralign 78:b = Consistent under H0 and Ha; obtained from {bf:xtreg}.}
+{ralign 78:B = Inconsistent under Ha, efficient under H0; obtained from {bf:xtreg}.}
+
+Test of H0: Difference in coefficients not systematic
+
+{ralign 11:chi2({res:6})} = (b-B)'[(V_b-V_B)^(-1)](b-B)
+{ralign 11:} = {res:{ralign 6:29.10}}
+{ralign 11:Prob > chi2} = {res:{ralign 6:0.0001}}
+(V_b-V_B is not positive definite)
+
+{com}. 
+. * 保存检验统计量
+. local chi2_val = r(chi2)
+{txt}
+{com}. local p_val = r(p)
+{txt}
+{com}. local df_val = r(df)
+{txt}
+{com}. 
+. disp ""
+{res}
+{txt}
+{com}. disp "  检验结论："
+{res}  检验结论：
+{txt}
+{com}. if `p_val' < 0.05 {c -(}
+.     disp "  Prob > chi2 = `p_val' < 0.05，拒绝原假设，应选择固定效应模型"
+{res}  Prob > chi2 = .0000581398030861 < 0.05，拒绝原假设，应选择固定效应模型
+{com}.     disp "  Reject H0, choose Fixed Effects model"
+{res}  Reject H0, choose Fixed Effects model
+{com}. {c )-}
+{txt}
+{com}. else {c -(}
+.     disp "  Prob > chi2 = `p_val' > 0.05，不能拒绝原假设，选择随机效应模型"
+.     disp "  Cannot reject H0, choose Random Effects model"
+. {c )-}
+{txt}
+{com}. 
+. * 用esttab输出FE和RE对比表（附带Hausman检验信息在标题中）
+. esttab fe_test re_test using "output/tables/table3_hausman_test.rtf", ///
+>     se star(* 0.1 ** 0.05 *** 0.01) ///
+>     title("表3 Hausman检验：固定效应 vs 随机效应 (chi2(`df_val')=`chi2_val', p=`p_val')") ///
+>     mtitle("固定效应 FE" "随机效应 RE") ///
+>     stats(r2 r2_a N, labels("R-squared" "Adj R-squared" "Observations")) ///
+>     alignment(center) replace
+{res}{txt}(output written to {browse  `"output/tables/table3_hausman_test.rtf"'})
+
+{com}. 
+. disp "  Hausman检验结果表已保存"
+{res}  Hausman检验结果表已保存
+{txt}
+{com}. disp ""
+{res}
+{txt}
+{com}. 
+. * ---- 5. 稳健性检验 ----
+. disp "=============================================================================="
+{res}==============================================================================
+{txt}
+{com}. disp "  Step 5: 稳健性检验 / Robustness Checks"
+{res}  Step 5: 稳健性检验 / Robustness Checks
+{txt}
+{com}. disp "=============================================================================="
+{res}==============================================================================
+{txt}
+{com}. disp ""
+{res}
+{txt}
+{com}. 
+. * 以固定效应为基准（通常FE更可靠）
+. 
+. * 稳健性检验1：替换被解释变量（用第三产业占比）
+. disp "稳健性检验1：替换被解释变量 (Tertiary Industry Share)"
+{res}稳健性检验1：替换被解释变量 (Tertiary Industry Share)
+{txt}
+{com}. xtreg tertiary_share fdi pgdp human_cap gov_exp openness infra urban, fe
+{res}
+{txt}Fixed-effects (within) regression{col 49}Number of obs{col 67}={col 69}{res}       403
+{txt}Group variable: {res}prov_id{txt}{col 49}Number of groups{col 67}={col 69}{res}        31
+
+{txt}R-squared:{col 49}Obs per group:
+     Within  = {res}0.9068{col 63}{txt}min{col 67}={col 69}{res}        13
+{txt}     Between = {res}0.8520{col 63}{txt}avg{col 67}={col 69}{res}      13.0
+{txt}     Overall = {res}0.7952{col 63}{txt}max{col 67}={col 69}{res}        13
+
+{txt}{col 49}F({res}7{txt}, {res}365{txt}){col 67}={col 70}{res}   507.35
+{txt}corr(u_i, Xb) = {res}-0.8806{txt}{col 49}Prob > F{col 67}={col 73}{res}0.0000
+
+{txt}{hline 13}{c TT}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{col 1}tertiary_s~e{col 14}{c |} Coefficient{col 26}  Std. err.{col 38}      t{col 46}   P>|t|{col 54}     [95% con{col 67}f. interval]
+{hline 13}{c +}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{space 9}fdi {c |}{col 14}{res}{space 2} .0033039{col 26}{space 2} .0022515{col 37}{space 1}    1.47{col 46}{space 3}0.143{col 54}{space 4}-.0011237{col 67}{space 3} .0077315
+{txt}{space 8}pgdp {c |}{col 14}{res}{space 2}-4.16e-06{col 26}{space 2} 9.29e-06{col 37}{space 1}   -0.45{col 46}{space 3}0.654{col 54}{space 4}-.0000224{col 67}{space 3} .0000141
+{txt}{space 3}human_cap {c |}{col 14}{res}{space 2}  .254352{col 26}{space 2} .5511854{col 37}{space 1}    0.46{col 46}{space 3}0.645{col 54}{space 4}-.8295457{col 67}{space 3}  1.33825
+{txt}{space 5}gov_exp {c |}{col 14}{res}{space 2} .0477104{col 26}{space 2} .0706255{col 37}{space 1}    0.68{col 46}{space 3}0.500{col 54}{space 4}-.0911736{col 67}{space 3} .1865943
+{txt}{space 4}openness {c |}{col 14}{res}{space 2} .0347489{col 26}{space 2} .0096622{col 37}{space 1}    3.60{col 46}{space 3}0.000{col 54}{space 4} .0157484{col 67}{space 3} .0537494
+{txt}{space 7}infra {c |}{col 14}{res}{space 2} .0996474{col 26}{space 2} .0221699{col 37}{space 1}    4.49{col 46}{space 3}0.000{col 54}{space 4} .0560507{col 67}{space 3} .1432442
+{txt}{space 7}urban {c |}{col 14}{res}{space 2} .3711542{col 26}{space 2} .0616662{col 37}{space 1}    6.02{col 46}{space 3}0.000{col 54}{space 4} .2498885{col 67}{space 3} .4924199
+{txt}{space 7}_cons {c |}{col 14}{res}{space 2} 15.58553{col 26}{space 2} 4.560983{col 37}{space 1}    3.42{col 46}{space 3}0.001{col 54}{space 4} 6.616429{col 67}{space 3} 24.55463
+{txt}{hline 13}{c +}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+     sigma_u {c |} {res} 5.0507967
+     {txt}sigma_e {c |} {res} 1.0653207
+         {txt}rho {c |} {res} .95740706{txt}   (fraction of variance due to u_i)
+{hline 13}{c BT}{hline 64}
+F test that all u_i=0: F({res}30{txt}, {res}365{txt}) = {res}39.27{col 62}{txt}Prob > F = {res}0.0000
+{txt}
+{com}. estimates store rob1
+{txt}
+{com}. 
+. * 稳健性检验2：对数形式（弹性分析）
+. disp ""
+{res}
+{txt}
+{com}. disp "稳健性检验2：对数形式模型 (Log Form / Elasticity)"
+{res}稳健性检验2：对数形式模型 (Log Form / Elasticity)
+{txt}
+{com}. xtreg ln_ts_ratio ln_fdi ln_pgdp human_cap gov_exp openness ln_infra urban, fe
+{res}
+{txt}Fixed-effects (within) regression{col 49}Number of obs{col 67}={col 69}{res}       403
+{txt}Group variable: {res}prov_id{txt}{col 49}Number of groups{col 67}={col 69}{res}        31
+
+{txt}R-squared:{col 49}Obs per group:
+     Within  = {res}0.9093{col 63}{txt}min{col 67}={col 69}{res}        13
+{txt}     Between = {res}0.8623{col 63}{txt}avg{col 67}={col 69}{res}      13.0
+{txt}     Overall = {res}0.8186{col 63}{txt}max{col 67}={col 69}{res}        13
+
+{txt}{col 49}F({res}7{txt}, {res}365{txt}){col 67}={col 70}{res}   522.56
+{txt}corr(u_i, Xb) = {res}-0.8501{txt}{col 49}Prob > F{col 67}={col 73}{res}0.0000
+
+{txt}{hline 13}{c TT}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{col 1} ln_ts_ratio{col 14}{c |} Coefficient{col 26}  Std. err.{col 38}      t{col 46}   P>|t|{col 54}     [95% con{col 67}f. interval]
+{hline 13}{c +}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{space 6}ln_fdi {c |}{col 14}{res}{space 2} .0735725{col 26}{space 2} .0258753{col 37}{space 1}    2.84{col 46}{space 3}0.005{col 54}{space 4} .0226892{col 67}{space 3} .1244559
+{txt}{space 5}ln_pgdp {c |}{col 14}{res}{space 2} .1499564{col 26}{space 2} .0458592{col 37}{space 1}    3.27{col 46}{space 3}0.001{col 54}{space 4} .0597749{col 67}{space 3} .2401378
+{txt}{space 3}human_cap {c |}{col 14}{res}{space 2}  .045636{col 26}{space 2} .0211774{col 37}{space 1}    2.15{col 46}{space 3}0.032{col 54}{space 4} .0039909{col 67}{space 3} .0872811
+{txt}{space 5}gov_exp {c |}{col 14}{res}{space 2} .0025585{col 26}{space 2} .0029173{col 37}{space 1}    0.88{col 46}{space 3}0.381{col 54}{space 4}-.0031784{col 67}{space 3} .0082954
+{txt}{space 4}openness {c |}{col 14}{res}{space 2} .0008867{col 26}{space 2} .0004055{col 37}{space 1}    2.19{col 46}{space 3}0.029{col 54}{space 4} .0000893{col 67}{space 3}  .001684
+{txt}{space 4}ln_infra {c |}{col 14}{res}{space 2} .1326293{col 26}{space 2} .0546206{col 37}{space 1}    2.43{col 46}{space 3}0.016{col 54}{space 4} .0252187{col 67}{space 3}   .24004
+{txt}{space 7}urban {c |}{col 14}{res}{space 2} .0140098{col 26}{space 2} .0024174{col 37}{space 1}    5.80{col 46}{space 3}0.000{col 54}{space 4}  .009256{col 67}{space 3} .0187636
+{txt}{space 7}_cons {c |}{col 14}{res}{space 2}-3.916362{col 26}{space 2}   .38746{col 37}{space 1}  -10.11{col 46}{space 3}0.000{col 54}{space 4}-4.678296{col 67}{space 3}-3.154428
+{txt}{hline 13}{c +}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+     sigma_u {c |} {res} .17844879
+     {txt}sigma_e {c |} {res} .04402239
+         {txt}rho {c |} {res} .94263294{txt}   (fraction of variance due to u_i)
+{hline 13}{c BT}{hline 64}
+F test that all u_i=0: F({res}30{txt}, {res}365{txt}) = {res}37.30{col 62}{txt}Prob > F = {res}0.0000
+{txt}
+{com}. estimates store rob2
+{txt}
+{com}. 
+. * 稳健性检验3：滞后一期FDI（缓解内生性/反向因果）
+. disp ""
+{res}
+{txt}
+{com}. disp "稳健性检验3：滞后一期FDI (Lagged FDI)"
+{res}稳健性检验3：滞后一期FDI (Lagged FDI)
+{txt}
+{com}. xtreg ts_ratio L.fdi pgdp human_cap gov_exp openness infra urban, fe
+{res}
+{txt}Fixed-effects (within) regression{col 49}Number of obs{col 67}={col 69}{res}       372
+{txt}Group variable: {res}prov_id{txt}{col 49}Number of groups{col 67}={col 69}{res}        31
+
+{txt}R-squared:{col 49}Obs per group:
+     Within  = {res}0.8789{col 63}{txt}min{col 67}={col 69}{res}        12
+{txt}     Between = {res}0.8890{col 63}{txt}avg{col 67}={col 69}{res}      12.0
+{txt}     Overall = {res}0.8540{col 63}{txt}max{col 67}={col 69}{res}        12
+
+{txt}{col 49}F({res}7{txt}, {res}334{txt}){col 67}={col 70}{res}   346.20
+{txt}corr(u_i, Xb) = {res}-0.8039{txt}{col 49}Prob > F{col 67}={col 73}{res}0.0000
+
+{txt}{hline 13}{c TT}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{col 1}    ts_ratio{col 14}{c |} Coefficient{col 26}  Std. err.{col 38}      t{col 46}   P>|t|{col 54}     [95% con{col 67}f. interval]
+{hline 13}{c +}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{space 9}fdi {c |}
+{space 9}L1. {c |}{col 14}{res}{space 2} .0006701{col 26}{space 2} .0001685{col 37}{space 1}    3.98{col 46}{space 3}0.000{col 54}{space 4} .0003387{col 67}{space 3} .0010015
+{txt}{space 12} {c |}
+{space 8}pgdp {c |}{col 14}{res}{space 2} 3.61e-06{col 26}{space 2} 6.93e-07{col 37}{space 1}    5.21{col 46}{space 3}0.000{col 54}{space 4} 2.25e-06{col 67}{space 3} 4.97e-06
+{txt}{space 3}human_cap {c |}{col 14}{res}{space 2} .0456162{col 26}{space 2} .0398723{col 37}{space 1}    1.14{col 46}{space 3}0.253{col 54}{space 4}-.0328163{col 67}{space 3} .1240487
+{txt}{space 5}gov_exp {c |}{col 14}{res}{space 2} .0030537{col 26}{space 2} .0050089{col 37}{space 1}    0.61{col 46}{space 3}0.543{col 54}{space 4}-.0067992{col 67}{space 3} .0129067
+{txt}{space 4}openness {c |}{col 14}{res}{space 2}  .000463{col 26}{space 2} .0006846{col 37}{space 1}    0.68{col 46}{space 3}0.499{col 54}{space 4}-.0008836{col 67}{space 3} .0018096
+{txt}{space 7}infra {c |}{col 14}{res}{space 2} .0060136{col 26}{space 2} .0016208{col 37}{space 1}    3.71{col 46}{space 3}0.000{col 54}{space 4} .0028254{col 67}{space 3} .0092018
+{txt}{space 7}urban {c |}{col 14}{res}{space 2} .0053197{col 26}{space 2} .0044731{col 37}{space 1}    1.19{col 46}{space 3}0.235{col 54}{space 4}-.0034793{col 67}{space 3} .0141186
+{txt}{space 7}_cons {c |}{col 14}{res}{space 2}-.5874945{col 26}{space 2} .3332695{col 37}{space 1}   -1.76{col 46}{space 3}0.079{col 54}{space 4}-1.243066{col 67}{space 3} .0680772
+{txt}{hline 13}{c +}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+     sigma_u {c |} {res} .20691395
+     {txt}sigma_e {c |} {res} .07258819
+         {txt}rho {c |} {res}  .8904164{txt}   (fraction of variance due to u_i)
+{hline 13}{c BT}{hline 64}
+F test that all u_i=0: F({res}30{txt}, {res}334{txt}) = {res}24.10{col 62}{txt}Prob > F = {res}0.0000
+{txt}
+{com}. estimates store rob3
+{txt}
+{com}. 
+. * 稳健性检验4：剔除直辖市（北京、天津、上海、重庆）
+. disp ""
+{res}
+{txt}
+{com}. disp "稳健性检验4：剔除直辖市 (Excluding Municipalities)"
+{res}稳健性检验4：剔除直辖市 (Excluding Municipalities)
+{txt}
+{com}. xtreg ts_ratio fdi pgdp human_cap gov_exp openness infra urban if ///
+>     province != "北京" & province != "天津" & province != "上海" & province != "重庆", fe
+{res}
+{txt}Fixed-effects (within) regression{col 49}Number of obs{col 67}={col 69}{res}       351
+{txt}Group variable: {res}prov_id{txt}{col 49}Number of groups{col 67}={col 69}{res}        27
+
+{txt}R-squared:{col 49}Obs per group:
+     Within  = {res}0.9009{col 63}{txt}min{col 67}={col 69}{res}        13
+{txt}     Between = {res}0.8720{col 63}{txt}avg{col 67}={col 69}{res}      13.0
+{txt}     Overall = {res}0.8456{col 63}{txt}max{col 67}={col 69}{res}        13
+
+{txt}{col 49}F({res}7{txt}, {res}317{txt}){col 67}={col 70}{res}   411.87
+{txt}corr(u_i, Xb) = {res}-0.7704{txt}{col 49}Prob > F{col 67}={col 73}{res}0.0000
+
+{txt}{hline 13}{c TT}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{col 1}    ts_ratio{col 14}{c |} Coefficient{col 26}  Std. err.{col 38}      t{col 46}   P>|t|{col 54}     [95% con{col 67}f. interval]
+{hline 13}{c +}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{space 9}fdi {c |}{col 14}{res}{space 2} .0007266{col 26}{space 2} .0001644{col 37}{space 1}    4.42{col 46}{space 3}0.000{col 54}{space 4} .0004031{col 67}{space 3} .0010501
+{txt}{space 8}pgdp {c |}{col 14}{res}{space 2} 3.65e-06{col 26}{space 2} 6.73e-07{col 37}{space 1}    5.42{col 46}{space 3}0.000{col 54}{space 4} 2.32e-06{col 67}{space 3} 4.97e-06
+{txt}{space 3}human_cap {c |}{col 14}{res}{space 2} .0260649{col 26}{space 2} .0378959{col 37}{space 1}    0.69{col 46}{space 3}0.492{col 54}{space 4}-.0484943{col 67}{space 3} .1006241
+{txt}{space 5}gov_exp {c |}{col 14}{res}{space 2}-.0012824{col 26}{space 2} .0048964{col 37}{space 1}   -0.26{col 46}{space 3}0.794{col 54}{space 4} -.010916{col 67}{space 3} .0083512
+{txt}{space 4}openness {c |}{col 14}{res}{space 2} .0012486{col 26}{space 2} .0006861{col 37}{space 1}    1.82{col 46}{space 3}0.070{col 54}{space 4}-.0001014{col 67}{space 3} .0025986
+{txt}{space 7}infra {c |}{col 14}{res}{space 2} .0048326{col 26}{space 2} .0015594{col 37}{space 1}    3.10{col 46}{space 3}0.002{col 54}{space 4} .0017644{col 67}{space 3} .0079007
+{txt}{space 7}urban {c |}{col 14}{res}{space 2} .0087862{col 26}{space 2} .0043528{col 37}{space 1}    2.02{col 46}{space 3}0.044{col 54}{space 4} .0002221{col 67}{space 3} .0173502
+{txt}{space 7}_cons {c |}{col 14}{res}{space 2}-.4821116{col 26}{space 2} .3097748{col 37}{space 1}   -1.56{col 46}{space 3}0.121{col 54}{space 4}-1.091586{col 67}{space 3} .1273628
+{txt}{hline 13}{c +}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+     sigma_u {c |} {res} .19808754
+     {txt}sigma_e {c |} {res} .06879166
+         {txt}rho {c |} {res} .89237689{txt}   (fraction of variance due to u_i)
+{hline 13}{c BT}{hline 64}
+F test that all u_i=0: F({res}26{txt}, {res}317{txt}) = {res}26.45{col 62}{txt}Prob > F = {res}0.0000
+{txt}
+{com}. estimates store rob4
+{txt}
+{com}. 
+. * 稳健性检验5：加入时间固定效应
+. disp ""
+{res}
+{txt}
+{com}. disp "稳健性检验5：双向固定效应 (Two-way FE: 个体+时间)"
+{res}稳健性检验5：双向固定效应 (Two-way FE: 个体+时间)
+{txt}
+{com}. xtreg ts_ratio fdi pgdp human_cap gov_exp openness infra urban i.year, fe
+{res}
+{txt}Fixed-effects (within) regression{col 49}Number of obs{col 67}={col 69}{res}       403
+{txt}Group variable: {res}prov_id{txt}{col 49}Number of groups{col 67}={col 69}{res}        31
+
+{txt}R-squared:{col 49}Obs per group:
+     Within  = {res}0.9170{col 63}{txt}min{col 67}={col 69}{res}        13
+{txt}     Between = {res}0.7509{col 63}{txt}avg{col 67}={col 69}{res}      13.0
+{txt}     Overall = {res}0.0083{col 63}{txt}max{col 67}={col 69}{res}        13
+
+{txt}{col 49}F({res}19{txt}, {res}353{txt}){col 67}={col 70}{res}   205.21
+{txt}corr(u_i, Xb) = {res}-0.4963{txt}{col 49}Prob > F{col 67}={col 73}{res}0.0000
+
+{txt}{hline 13}{c TT}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{col 1}    ts_ratio{col 14}{c |} Coefficient{col 26}  Std. err.{col 38}      t{col 46}   P>|t|{col 54}     [95% con{col 67}f. interval]
+{hline 13}{c +}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{space 9}fdi {c |}{col 14}{res}{space 2} .0005036{col 26}{space 2} .0001512{col 37}{space 1}    3.33{col 46}{space 3}0.001{col 54}{space 4} .0002062{col 67}{space 3} .0008011
+{txt}{space 8}pgdp {c |}{col 14}{res}{space 2} 2.94e-06{col 26}{space 2} 6.09e-07{col 37}{space 1}    4.83{col 46}{space 3}0.000{col 54}{space 4} 1.74e-06{col 67}{space 3} 4.14e-06
+{txt}{space 3}human_cap {c |}{col 14}{res}{space 2}-.0297196{col 26}{space 2} .0352586{col 37}{space 1}   -0.84{col 46}{space 3}0.400{col 54}{space 4}-.0990629{col 67}{space 3} .0396237
+{txt}{space 5}gov_exp {c |}{col 14}{res}{space 2} .0016105{col 26}{space 2} .0044583{col 37}{space 1}    0.36{col 46}{space 3}0.718{col 54}{space 4}-.0071576{col 67}{space 3} .0103786
+{txt}{space 4}openness {c |}{col 14}{res}{space 2} .0028201{col 26}{space 2} .0007522{col 37}{space 1}    3.75{col 46}{space 3}0.000{col 54}{space 4} .0013408{col 67}{space 3} .0042994
+{txt}{space 7}infra {c |}{col 14}{res}{space 2}-.0018738{col 26}{space 2} .0017247{col 37}{space 1}   -1.09{col 46}{space 3}0.278{col 54}{space 4}-.0052658{col 67}{space 3} .0015183
+{txt}{space 7}urban {c |}{col 14}{res}{space 2}-.0184984{col 26}{space 2} .0053648{col 37}{space 1}   -3.45{col 46}{space 3}0.001{col 54}{space 4}-.0290494{col 67}{space 3}-.0079475
+{txt}{space 12} {c |}
+{space 8}year {c |}
+{space 7}2011  {c |}{col 14}{res}{space 2} .0626337{col 26}{space 2} .0199279{col 37}{space 1}    3.14{col 46}{space 3}0.002{col 54}{space 4} .0234413{col 67}{space 3} .1018262
+{txt}{space 7}2012  {c |}{col 14}{res}{space 2} .1296341{col 26}{space 2} .0262274{col 37}{space 1}    4.94{col 46}{space 3}0.000{col 54}{space 4} .0780524{col 67}{space 3} .1812158
+{txt}{space 7}2013  {c |}{col 14}{res}{space 2} .1821254{col 26}{space 2} .0341827{col 37}{space 1}    5.33{col 46}{space 3}0.000{col 54}{space 4}  .114898{col 67}{space 3} .2493527
+{txt}{space 7}2014  {c |}{col 14}{res}{space 2} .2477555{col 26}{space 2}  .042149{col 37}{space 1}    5.88{col 46}{space 3}0.000{col 54}{space 4} .1648607{col 67}{space 3} .3306504
+{txt}{space 7}2015  {c |}{col 14}{res}{space 2} .2962405{col 26}{space 2} .0517043{col 37}{space 1}    5.73{col 46}{space 3}0.000{col 54}{space 4} .1945533{col 67}{space 3} .3979277
+{txt}{space 7}2016  {c |}{col 14}{res}{space 2} .3622067{col 26}{space 2} .0609636{col 37}{space 1}    5.94{col 46}{space 3}0.000{col 54}{space 4} .2423091{col 67}{space 3} .4821043
+{txt}{space 7}2017  {c |}{col 14}{res}{space 2} .4284126{col 26}{space 2} .0710004{col 37}{space 1}    6.03{col 46}{space 3}0.000{col 54}{space 4} .2887756{col 67}{space 3} .5680496
+{txt}{space 7}2018  {c |}{col 14}{res}{space 2} .5062419{col 26}{space 2} .0803106{col 37}{space 1}    6.30{col 46}{space 3}0.000{col 54}{space 4} .3482945{col 67}{space 3} .6641892
+{txt}{space 7}2019  {c |}{col 14}{res}{space 2} .5401274{col 26}{space 2} .0891609{col 37}{space 1}    6.06{col 46}{space 3}0.000{col 54}{space 4}  .364774{col 67}{space 3} .7154807
+{txt}{space 7}2020  {c |}{col 14}{res}{space 2} .6626727{col 26}{space 2} .0980326{col 37}{space 1}    6.76{col 46}{space 3}0.000{col 54}{space 4} .4698713{col 67}{space 3}  .855474
+{txt}{space 7}2021  {c |}{col 14}{res}{space 2} .7243323{col 26}{space 2} .1073231{col 37}{space 1}    6.75{col 46}{space 3}0.000{col 54}{space 4} .5132591{col 67}{space 3} .9354055
+{txt}{space 7}2022  {c |}{col 14}{res}{space 2} .7927273{col 26}{space 2} .1167884{col 37}{space 1}    6.79{col 46}{space 3}0.000{col 54}{space 4} .5630387{col 67}{space 3} 1.022416
+{txt}{space 12} {c |}
+{space 7}_cons {c |}{col 14}{res}{space 2} 2.358581{col 26}{space 2} .5176815{col 37}{space 1}    4.56{col 46}{space 3}0.000{col 54}{space 4} 1.340453{col 67}{space 3} 3.376709
+{txt}{hline 13}{c +}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+     sigma_u {c |} {res} .42424231
+     {txt}sigma_e {c |} {res} .06555911
+         {txt}rho {c |} {res} .97667675{txt}   (fraction of variance due to u_i)
+{hline 13}{c BT}{hline 64}
+F test that all u_i=0: F({res}30{txt}, {res}353{txt}) = {res}29.46{col 62}{txt}Prob > F = {res}0.0000
+{txt}
+{com}. estimates store rob5
+{txt}
+{com}. 
+. * 输出稳健性检验结果表
+. esttab rob1 rob2 rob3 rob4 rob5 using "output/tables/table4_robustness_check.rtf", ///
+>     se star(* 0.1 ** 0.05 *** 0.01) ///
+>     title("表4 稳健性检验结果") ///
+>     mtitle("替换被解释变量" "对数形式" "滞后FDI" "剔除直辖市" "双向固定效应") ///
+>     stats(r2 r2_a N, labels("R-squared" "Adj R-squared" "Observations")) ///
+>     alignment(center) replace
+{res}{txt}(output written to {browse  `"output/tables/table4_robustness_check.rtf"'})
+
+{com}. 
+. disp ""
+{res}
+{txt}
+{com}. disp "  稳健性检验结果表已保存"
+{res}  稳健性检验结果表已保存
+{txt}
+{com}. disp ""
+{res}
+{txt}
+{com}. 
+. * ---- 6. 异质性分析（分地区） ----
+. disp "=============================================================================="
+{res}==============================================================================
+{txt}
+{com}. disp "  Step 6: 异质性分析 / Heterogeneity Analysis (By Region)"
+{res}  Step 6: 异质性分析 / Heterogeneity Analysis (By Region)
+{txt}
+{com}. disp "=============================================================================="
+{res}==============================================================================
+{txt}
+{com}. disp ""
+{res}
+{txt}
+{com}. 
+. * 东部地区
+. disp "异质性分析：东部地区 / Eastern Region"
+{res}异质性分析：东部地区 / Eastern Region
+{txt}
+{com}. xtreg ts_ratio fdi pgdp human_cap gov_exp openness infra urban if region == "东部", fe
+{res}
+{txt}Fixed-effects (within) regression{col 49}Number of obs{col 67}={col 69}{res}       143
+{txt}Group variable: {res}prov_id{txt}{col 49}Number of groups{col 67}={col 69}{res}        11
+
+{txt}R-squared:{col 49}Obs per group:
+     Within  = {res}0.9130{col 63}{txt}min{col 67}={col 69}{res}        13
+{txt}     Between = {res}0.3015{col 63}{txt}avg{col 67}={col 69}{res}      13.0
+{txt}     Overall = {res}0.7652{col 63}{txt}max{col 67}={col 69}{res}        13
+
+{txt}{col 49}F({res}7{txt}, {res}125{txt}){col 67}={col 70}{res}   187.33
+{txt}corr(u_i, Xb) = {res}-0.2937{txt}{col 49}Prob > F{col 67}={col 73}{res}0.0000
+
+{txt}{hline 13}{c TT}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{col 1}    ts_ratio{col 14}{c |} Coefficient{col 26}  Std. err.{col 38}      t{col 46}   P>|t|{col 54}     [95% con{col 67}f. interval]
+{hline 13}{c +}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{space 9}fdi {c |}{col 14}{res}{space 2} .0006926{col 26}{space 2}  .000232{col 37}{space 1}    2.99{col 46}{space 3}0.003{col 54}{space 4} .0002334{col 67}{space 3} .0011519
+{txt}{space 8}pgdp {c |}{col 14}{res}{space 2} 1.80e-06{col 26}{space 2} 1.17e-06{col 37}{space 1}    1.54{col 46}{space 3}0.125{col 54}{space 4}-5.09e-07{col 67}{space 3} 4.12e-06
+{txt}{space 3}human_cap {c |}{col 14}{res}{space 2} .0744949{col 26}{space 2} .0687968{col 37}{space 1}    1.08{col 46}{space 3}0.281{col 54}{space 4}-.0616625{col 67}{space 3} .2106523
+{txt}{space 5}gov_exp {c |}{col 14}{res}{space 2} .0126603{col 26}{space 2} .0093867{col 37}{space 1}    1.35{col 46}{space 3}0.180{col 54}{space 4}-.0059171{col 67}{space 3} .0312378
+{txt}{space 4}openness {c |}{col 14}{res}{space 2} .0008532{col 26}{space 2} .0008974{col 37}{space 1}    0.95{col 46}{space 3}0.344{col 54}{space 4}-.0009228{col 67}{space 3} .0026291
+{txt}{space 7}infra {c |}{col 14}{res}{space 2} .0108675{col 26}{space 2} .0026367{col 37}{space 1}    4.12{col 46}{space 3}0.000{col 54}{space 4} .0056491{col 67}{space 3}  .016086
+{txt}{space 7}urban {c |}{col 14}{res}{space 2}-.0016743{col 26}{space 2} .0073044{col 37}{space 1}   -0.23{col 46}{space 3}0.819{col 54}{space 4}-.0161306{col 67}{space 3} .0127821
+{txt}{space 7}_cons {c |}{col 14}{res}{space 2}-1.286079{col 26}{space 2} .6343441{col 37}{space 1}   -2.03{col 46}{space 3}0.045{col 54}{space 4}-2.541525{col 67}{space 3}-.0306335
+{txt}{hline 13}{c +}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+     sigma_u {c |} {res}  .1243371
+     {txt}sigma_e {c |} {res} .08171941
+         {txt}rho {c |} {res} .69834087{txt}   (fraction of variance due to u_i)
+{hline 13}{c BT}{hline 64}
+F test that all u_i=0: F({res}10{txt}, {res}125{txt}) = {res}11.54{col 62}{txt}Prob > F = {res}0.0000
+{txt}
+{com}. estimates store east
+{txt}
+{com}. 
+. * 中部地区
+. disp ""
+{res}
+{txt}
+{com}. disp "异质性分析：中部地区 / Central Region"
+{res}异质性分析：中部地区 / Central Region
+{txt}
+{com}. xtreg ts_ratio fdi pgdp human_cap gov_exp openness infra urban if region == "中部", fe
+{res}
+{txt}Fixed-effects (within) regression{col 49}Number of obs{col 67}={col 69}{res}       104
+{txt}Group variable: {res}prov_id{txt}{col 49}Number of groups{col 67}={col 69}{res}         8
+
+{txt}R-squared:{col 49}Obs per group:
+     Within  = {res}0.9216{col 63}{txt}min{col 67}={col 69}{res}        13
+{txt}     Between = {res}0.0569{col 63}{txt}avg{col 67}={col 69}{res}      13.0
+{txt}     Overall = {res}0.4581{col 63}{txt}max{col 67}={col 69}{res}        13
+
+{txt}{col 49}F({res}7{txt}, {res}89{txt}){col 67}={col 70}{res}   149.48
+{txt}corr(u_i, Xb) = {res}-0.4858{txt}{col 49}Prob > F{col 67}={col 73}{res}0.0000
+
+{txt}{hline 13}{c TT}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{col 1}    ts_ratio{col 14}{c |} Coefficient{col 26}  Std. err.{col 38}      t{col 46}   P>|t|{col 54}     [95% con{col 67}f. interval]
+{hline 13}{c +}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{space 9}fdi {c |}{col 14}{res}{space 2}  .000364{col 26}{space 2} .0003232{col 37}{space 1}    1.13{col 46}{space 3}0.263{col 54}{space 4}-.0002781{col 67}{space 3} .0010061
+{txt}{space 8}pgdp {c |}{col 14}{res}{space 2} 1.12e-06{col 26}{space 2} 1.39e-06{col 37}{space 1}    0.80{col 46}{space 3}0.425{col 54}{space 4}-1.65e-06{col 67}{space 3} 3.88e-06
+{txt}{space 3}human_cap {c |}{col 14}{res}{space 2}-.0676677{col 26}{space 2}   .06056{col 37}{space 1}   -1.12{col 46}{space 3}0.267{col 54}{space 4}-.1879992{col 67}{space 3} .0526638
+{txt}{space 5}gov_exp {c |}{col 14}{res}{space 2}-.0044041{col 26}{space 2} .0076451{col 37}{space 1}   -0.58{col 46}{space 3}0.566{col 54}{space 4}-.0195948{col 67}{space 3} .0107866
+{txt}{space 4}openness {c |}{col 14}{res}{space 2} .0013748{col 26}{space 2} .0014459{col 37}{space 1}    0.95{col 46}{space 3}0.344{col 54}{space 4}-.0014982{col 67}{space 3} .0042479
+{txt}{space 7}infra {c |}{col 14}{res}{space 2} .0005072{col 26}{space 2} .0028986{col 37}{space 1}    0.17{col 46}{space 3}0.861{col 54}{space 4}-.0052523{col 67}{space 3} .0062666
+{txt}{space 7}urban {c |}{col 14}{res}{space 2} .0381474{col 26}{space 2} .0084508{col 37}{space 1}    4.51{col 46}{space 3}0.000{col 54}{space 4} .0213558{col 67}{space 3}  .054939
+{txt}{space 7}_cons {c |}{col 14}{res}{space 2}-.7111367{col 26}{space 2} .5289021{col 37}{space 1}   -1.34{col 46}{space 3}0.182{col 54}{space 4}-1.762054{col 67}{space 3} .3397805
+{txt}{hline 13}{c +}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+     sigma_u {c |} {res} .17781773
+     {txt}sigma_e {c |} {res}   .058446
+         {txt}rho {c |} {res} .90249958{txt}   (fraction of variance due to u_i)
+{hline 13}{c BT}{hline 64}
+F test that all u_i=0: F({res}7{txt}, {res}89{txt}) = {res}20.03{col 62}{txt}Prob > F = {res}0.0000
+{txt}
+{com}. estimates store central
+{txt}
+{com}. 
+. * 西部地区
+. disp ""
+{res}
+{txt}
+{com}. disp "异质性分析：西部地区 / Western Region"
+{res}异质性分析：西部地区 / Western Region
+{txt}
+{com}. xtreg ts_ratio fdi pgdp human_cap gov_exp openness infra urban if region == "西部", fe
+{res}
+{txt}Fixed-effects (within) regression{col 49}Number of obs{col 67}={col 69}{res}       156
+{txt}Group variable: {res}prov_id{txt}{col 49}Number of groups{col 67}={col 69}{res}        12
+
+{txt}R-squared:{col 49}Obs per group:
+     Within  = {res}0.9034{col 63}{txt}min{col 67}={col 69}{res}        13
+{txt}     Between = {res}0.0029{col 63}{txt}avg{col 67}={col 69}{res}      13.0
+{txt}     Overall = {res}0.5062{col 63}{txt}max{col 67}={col 69}{res}        13
+
+{txt}{col 49}F({res}7{txt}, {res}137{txt}){col 67}={col 70}{res}   183.09
+{txt}corr(u_i, Xb) = {res}-0.3989{txt}{col 49}Prob > F{col 67}={col 73}{res}0.0000
+
+{txt}{hline 13}{c TT}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{col 1}    ts_ratio{col 14}{c |} Coefficient{col 26}  Std. err.{col 38}      t{col 46}   P>|t|{col 54}     [95% con{col 67}f. interval]
+{hline 13}{c +}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{space 9}fdi {c |}{col 14}{res}{space 2}-4.29e-06{col 26}{space 2}  .000281{col 37}{space 1}   -0.02{col 46}{space 3}0.988{col 54}{space 4}-.0005599{col 67}{space 3} .0005514
+{txt}{space 8}pgdp {c |}{col 14}{res}{space 2} 6.37e-07{col 26}{space 2} 1.60e-06{col 37}{space 1}    0.40{col 46}{space 3}0.690{col 54}{space 4}-2.52e-06{col 67}{space 3} 3.79e-06
+{txt}{space 3}human_cap {c |}{col 14}{res}{space 2} .0300079{col 26}{space 2} .0521898{col 37}{space 1}    0.57{col 46}{space 3}0.566{col 54}{space 4}-.0731939{col 67}{space 3} .1332097
+{txt}{space 5}gov_exp {c |}{col 14}{res}{space 2}  .005569{col 26}{space 2} .0062049{col 37}{space 1}    0.90{col 46}{space 3}0.371{col 54}{space 4}-.0067007{col 67}{space 3} .0178387
+{txt}{space 4}openness {c |}{col 14}{res}{space 2} .0015759{col 26}{space 2} .0013519{col 37}{space 1}    1.17{col 46}{space 3}0.246{col 54}{space 4}-.0010975{col 67}{space 3} .0042492
+{txt}{space 7}infra {c |}{col 14}{res}{space 2} .0045412{col 26}{space 2} .0021658{col 37}{space 1}    2.10{col 46}{space 3}0.038{col 54}{space 4} .0002585{col 67}{space 3} .0088239
+{txt}{space 7}urban {c |}{col 14}{res}{space 2} .0192122{col 26}{space 2} .0064157{col 37}{space 1}    2.99{col 46}{space 3}0.003{col 54}{space 4} .0065257{col 67}{space 3} .0318987
+{txt}{space 7}_cons {c |}{col 14}{res}{space 2}-.7680595{col 26}{space 2} .3992055{col 37}{space 1}   -1.92{col 46}{space 3}0.056{col 54}{space 4}-1.557461{col 67}{space 3} .0213418
+{txt}{hline 13}{c +}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+     sigma_u {c |} {res}  .1447327
+     {txt}sigma_e {c |} {res} .05819693
+         {txt}rho {c |} {res} .86081935{txt}   (fraction of variance due to u_i)
+{hline 13}{c BT}{hline 64}
+F test that all u_i=0: F({res}11{txt}, {res}137{txt}) = {res}44.59{col 62}{txt}Prob > F = {res}0.0000
+{txt}
+{com}. estimates store west
+{txt}
+{com}. 
+. * 输出分地区回归结果
+. esttab east central west using "output/tables/table5_heterogeneity.rtf", ///
+>     se star(* 0.1 ** 0.05 *** 0.01) ///
+>     title("表5 分地区异质性分析结果（固定效应）") ///
+>     mtitle("东部地区" "中部地区" "西部地区") ///
+>     stats(r2 r2_a N, labels("R-squared" "Adj R-squared" "Observations")) ///
+>     alignment(center) replace
+{res}{txt}(output written to {browse  `"output/tables/table5_heterogeneity.rtf"'})
+
+{com}. 
+. disp ""
+{res}
+{txt}
+{com}. disp "  异质性分析结果表已保存"
+{res}  异质性分析结果表已保存
+{txt}
+{com}. disp ""
+{res}
+{txt}
+{com}. 
+. * ---- 7. 模型诊断 ----
+. disp "=============================================================================="
+{res}==============================================================================
+{txt}
+{com}. disp "  Step 7: 模型诊断 / Model Diagnostics"
+{res}  Step 7: 模型诊断 / Model Diagnostics
+{txt}
+{com}. disp "=============================================================================="
+{res}==============================================================================
+{txt}
+{com}. disp ""
+{res}
+{txt}
+{com}. 
+. quietly xtreg ts_ratio fdi pgdp human_cap gov_exp openness infra urban, fe
+{txt}
+{com}. 
+. * 多重共线性检验
+. disp "多重共线性检验 / VIF Test (after reg):"
+{res}多重共线性检验 / VIF Test (after reg):
+{txt}
+{com}. reg ts_ratio fdi pgdp human_cap gov_exp openness infra urban
+
+{txt}      Source {c |}       SS           df       MS      Number of obs   ={res}       403
+{txt}{hline 13}{c +}{hline 34}   F(7, 395)       = {res}   463.42
+{txt}       Model {c |} {res} 48.9228695         7  6.98898136   {txt}Prob > F        ={res}    0.0000
+{txt}    Residual {c |} {res} 5.95716003       395  .015081418   {txt}R-squared       ={res}    0.8915
+{txt}{hline 13}{c +}{hline 34}   Adj R-squared   ={res}    0.8895
+{txt}       Total {c |} {res} 54.8800295       402  .136517486   {txt}Root MSE        =   {res} .12281
+
+{txt}{hline 13}{c TT}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{col 1}    ts_ratio{col 14}{c |} Coefficient{col 26}  Std. err.{col 38}      t{col 46}   P>|t|{col 54}     [95% con{col 67}f. interval]
+{hline 13}{c +}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{space 9}fdi {c |}{col 14}{res}{space 2} .0006544{col 26}{space 2} .0001929{col 37}{space 1}    3.39{col 46}{space 3}0.001{col 54}{space 4} .0002752{col 67}{space 3} .0010336
+{txt}{space 8}pgdp {c |}{col 14}{res}{space 2} 7.23e-06{col 26}{space 2} 6.91e-07{col 37}{space 1}   10.46{col 46}{space 3}0.000{col 54}{space 4} 5.87e-06{col 67}{space 3} 8.59e-06
+{txt}{space 3}human_cap {c |}{col 14}{res}{space 2} .1022087{col 26}{space 2} .0279899{col 37}{space 1}    3.65{col 46}{space 3}0.000{col 54}{space 4}  .047181{col 67}{space 3} .1572364
+{txt}{space 5}gov_exp {c |}{col 14}{res}{space 2} .0032529{col 26}{space 2} .0037241{col 37}{space 1}    0.87{col 46}{space 3}0.383{col 54}{space 4}-.0040686{col 67}{space 3} .0105743
+{txt}{space 4}openness {c |}{col 14}{res}{space 2}-.0036146{col 26}{space 2} .0006679{col 37}{space 1}   -5.41{col 46}{space 3}0.000{col 54}{space 4}-.0049278{col 67}{space 3}-.0023015
+{txt}{space 7}infra {c |}{col 14}{res}{space 2} .0035471{col 26}{space 2} .0010341{col 37}{space 1}    3.43{col 46}{space 3}0.001{col 54}{space 4}  .001514{col 67}{space 3} .0055801
+{txt}{space 7}urban {c |}{col 14}{res}{space 2}-.0074362{col 26}{space 2} .0024643{col 37}{space 1}   -3.02{col 46}{space 3}0.003{col 54}{space 4}-.0122811{col 67}{space 3}-.0025914
+{txt}{space 7}_cons {c |}{col 14}{res}{space 2}  -.05205{col 26}{space 2} .1996017{col 37}{space 1}   -0.26{col 46}{space 3}0.794{col 54}{space 4}-.4444645{col 67}{space 3} .3403646
+{txt}{hline 13}{c BT}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{res}{txt}
+{com}. estat vif
+
+{txt}    Variable {c |}       VIF       1/VIF  
+{hline 13}{c +}{hline 22}
+{space 7}infra {c |} {res}    32.07    0.031183
+{txt}{space 7}urban {c |} {res}    28.30    0.035330
+{txt}{space 3}human_cap {c |} {res}    16.87    0.059291
+{txt}{space 8}pgdp {c |} {res}    13.14    0.076101
+{txt}{space 9}fdi {c |} {res}    10.88    0.091902
+{txt}{space 4}openness {c |} {res}     5.61    0.178336
+{txt}{space 5}gov_exp {c |} {res}     3.81    0.262644
+{txt}{hline 13}{c +}{hline 22}
+    Mean VIF {c |} {res}    15.81
+{txt}
+{com}. 
+. disp ""
+{res}
+{txt}
+{com}. 
+. * ---- 8. 数据导出 ----
+. quietly xtreg ts_ratio fdi pgdp human_cap gov_exp openness infra urban, fe
+{txt}
+{com}. predict fitted_fe, xb
+{txt}
+{com}. predict resid_fe, e
+{txt}
+{com}. 
+. outsheet province year ts_ratio fdi fitted_fe resid_fe region ///
+>     using "data/fdi_regression_results.csv", comma replace
+{txt}{p 0 4 2}
+(file {bf}
+data/fdi_regression_results.csv{rm}
+not found)
+{p_end}
+
+{com}. 
+. disp "  回归结果数据已保存：data/fdi_regression_results.csv"
+{res}  回归结果数据已保存：data/fdi_regression_results.csv
+{txt}
+{com}. disp ""
+{res}
+{txt}
+{com}. 
+. * ---- 9. 结果汇总 ----
+. disp "=============================================================================="
+{res}==============================================================================
+{txt}
+{com}. disp "  🎉 面板数据实证分析完成！"
+{res}  🎉 面板数据实证分析完成！
+{txt}
+{com}. disp "  Panel Data Empirical Analysis Completed!"
+{res}  Panel Data Empirical Analysis Completed!
+{txt}
+{com}. disp "=============================================================================="
+{res}==============================================================================
+{txt}
+{com}. disp ""
+{res}
+{txt}
+{com}. disp "📊 输出文件清单 / Output Files:"
+{res}📊 输出文件清单 / Output Files:
+{txt}
+{com}. disp ""
+{res}
+{txt}
+{com}. disp "  表格 / Tables:"
+{res}  表格 / Tables:
+{txt}
+{com}. disp "    - output/tables/table1_descriptive_stats.rtf    描述性统计"
+{res}    - output/tables/table1_descriptive_stats.rtf    描述性统计
+{txt}
+{com}. disp "    - output/tables/table2_baseline_regression.rtf  基准回归（OLS/FE/RE）"
+{res}    - output/tables/table2_baseline_regression.rtf  基准回归（OLS/FE/RE）
+{txt}
+{com}. disp "    - output/tables/table3_hausman_test.rtf         Hausman检验"
+{res}    - output/tables/table3_hausman_test.rtf         Hausman检验
+{txt}
+{com}. disp "    - output/tables/table4_robustness_check.rtf     稳健性检验（5种）"
+{res}    - output/tables/table4_robustness_check.rtf     稳健性检验（5种）
+{txt}
+{com}. disp "    - output/tables/table5_heterogeneity.rtf        分地区异质性分析"
+{res}    - output/tables/table5_heterogeneity.rtf        分地区异质性分析
+{txt}
+{com}. disp ""
+{res}
+{txt}
+{com}. disp "  数据 / Data:"
+{res}  数据 / Data:
+{txt}
+{com}. disp "    - data/fdi_panel_data_clean.csv                 清洗后面板数据"
+{res}    - data/fdi_panel_data_clean.csv                 清洗后面板数据
+{txt}
+{com}. disp "    - data/fdi_regression_results.csv               回归结果数据"
+{res}    - data/fdi_regression_results.csv               回归结果数据
+{txt}
+{com}. disp ""
+{res}
+{txt}
+{com}. disp "💡 提示：.rtf文件可直接用Word打开，复制粘贴到论文中即可"
+{res}💡 提示：.rtf文件可直接用Word打开，复制粘贴到论文中即可
+{txt}
+{com}. disp ""
+{res}
+{txt}
+{com}. 
+. log close
+      {txt}name:  {res}<unnamed>
+       {txt}log:  {res}C:\Users\33841\Desktop\project2_fdi_industry\output/stata_log.smcl
+  {txt}log type:  {res}smcl
+ {txt}closed on:  {res}27 Sep 2026, 23:31:29
+{txt}{.-}
+{smcl}
+{txt}{sf}{ul off}

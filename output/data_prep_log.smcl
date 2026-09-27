@@ -1,0 +1,767 @@
+{smcl}
+{com}{sf}{ul off}{txt}{.-}
+      name:  {res}<unnamed>
+       {txt}log:  {res}C:\Users\33841\Desktop\project2_fdi_industry\output/data_prep_log.smcl
+  {txt}log type:  {res}smcl
+ {txt}opened on:  {res}27 Sep 2026, 23:30:13
+{txt}
+{com}. 
+. disp ""
+{res}
+{txt}
+{com}. disp "=============================================================================="
+{res}==============================================================================
+{txt}
+{com}. disp "  项目二：FDI对中国产业结构升级的影响研究"
+{res}  项目二：FDI对中国产业结构升级的影响研究
+{txt}
+{com}. disp "  Project 2: FDI and Industrial Structure Upgrading"
+{res}  Project 2: FDI and Industrial Structure Upgrading
+{txt}
+{com}. disp "  (基于省际面板数据 / Provincial Panel Data)"
+{res}  (基于省际面板数据 / Provincial Panel Data)
+{txt}
+{com}. disp "  数据准备 — 纯Stata实现 / Data Preparation — Pure Stata"
+{res}  数据准备 — 纯Stata实现 / Data Preparation — Pure Stata
+{txt}
+{com}. disp "=============================================================================="
+{res}==============================================================================
+{txt}
+{com}. disp ""
+{res}
+{txt}
+{com}. disp "当前工作目录: `c(pwd)'"
+{res}当前工作目录: C:\Users\33841\Desktop\project2_fdi_industry
+{txt}
+{com}. disp ""
+{res}
+{txt}
+{com}. 
+. * ---- 1. 导入原始数据 ----
+. disp "Step 1: 导入原始数据 / Importing raw data..."
+{res}Step 1: 导入原始数据 / Importing raw data...
+{txt}
+{com}. disp ""
+{res}
+{txt}
+{com}. 
+. * 从CSV导入原始面板数据
+. import delimited using "data/fdi_panel_data_raw.csv", varnames(1) clear stringcols(1 3)
+{res}{txt}(encoding automatically selected: UTF-8)
+{res}{text}(13 vars, 403 obs)
+
+{com}. 
+. * 重命名变量（确保变量名为英文且规范）
+. disp "  数据导入成功！"
+{res}  数据导入成功！
+{txt}
+{com}. disp "  变量列表："
+{res}  变量列表：
+{txt}
+{com}. describe
+
+{txt}Contains data
+ Observations:{res}           403                  
+{txt}    Variables:{res}            13                  
+{txt}{hline}
+Variable      Storage   Display    Value
+    name         type    format    label      Variable label
+{hline}
+{p 0 48}{res}{bind:province       }{txt}{bind: str9    }{bind:%9s       }{space 1}{bind:         }{bind:  }{res}{res}{p_end}
+{p 0 48}{bind:year           }{txt}{bind: int     }{bind:%8.0g     }{space 1}{bind:         }{bind:  }{res}{res}{p_end}
+{p 0 48}{bind:region         }{txt}{bind: str6    }{bind:%9s       }{space 1}{bind:         }{bind:  }{res}{res}{p_end}
+{p 0 48}{bind:fdi            }{txt}{bind: float   }{bind:%9.0g     }{space 1}{bind:         }{bind:  }{res}{res}{p_end}
+{p 0 48}{bind:ts_ratio       }{txt}{bind: float   }{bind:%9.0g     }{space 1}{bind:         }{bind:  }{res}{res}{p_end}
+{p 0 48}{bind:tertiary_share }{txt}{bind: float   }{bind:%9.0g     }{space 1}{bind:         }{bind:  }{res}{res}{p_end}
+{p 0 48}{bind:secondary_share}{txt}{bind: float   }{bind:%9.0g     }{space 1}{bind:         }{bind:  }{res}{res}{p_end}
+{p 0 48}{bind:pgdp           }{txt}{bind: long    }{bind:%12.0g    }{space 1}{bind:         }{bind:  }{res}{res}{p_end}
+{p 0 48}{bind:human_cap      }{txt}{bind: float   }{bind:%9.0g     }{space 1}{bind:         }{bind:  }{res}{res}{p_end}
+{p 0 48}{bind:gov_exp        }{txt}{bind: float   }{bind:%9.0g     }{space 1}{bind:         }{bind:  }{res}{res}{p_end}
+{p 0 48}{bind:openness       }{txt}{bind: float   }{bind:%9.0g     }{space 1}{bind:         }{bind:  }{res}{res}{p_end}
+{p 0 48}{bind:infra          }{txt}{bind: float   }{bind:%9.0g     }{space 1}{bind:         }{bind:  }{res}{res}{p_end}
+{p 0 48}{bind:urban          }{txt}{bind: float   }{bind:%9.0g     }{space 1}{bind:         }{bind:  }{res}{res}{p_end}
+{txt}{hline}
+Sorted by: 
+     Note: {res}Dataset has changed since last saved.
+{txt}
+{com}. disp ""
+{res}
+{txt}
+{com}. 
+. * 确保数据类型正确
+. destring fdi, replace force
+{txt}fdi already numeric; no {res}replace
+{txt}
+{com}. destring ts_ratio, replace force
+{txt}ts_ratio already numeric; no {res}replace
+{txt}
+{com}. destring tertiary_share, replace force
+{txt}tertiary_share already numeric; no {res}replace
+{txt}
+{com}. destring secondary_share, replace force
+{txt}secondary_share already numeric; no {res}replace
+{txt}
+{com}. destring pgdp, replace force
+{txt}pgdp already numeric; no {res}replace
+{txt}
+{com}. destring human_cap, replace force
+{txt}human_cap already numeric; no {res}replace
+{txt}
+{com}. destring gov_exp, replace force
+{txt}gov_exp already numeric; no {res}replace
+{txt}
+{com}. destring openness, replace force
+{txt}openness already numeric; no {res}replace
+{txt}
+{com}. destring infra, replace force
+{txt}infra already numeric; no {res}replace
+{txt}
+{com}. destring urban, replace force
+{txt}urban already numeric; no {res}replace
+{txt}
+{com}. destring year, replace force
+{txt}year already numeric; no {res}replace
+{txt}
+{com}. 
+. * 标签变量
+. label var province "省份名称 Province"
+{txt}
+{com}. label var year "年份 Year"
+{txt}
+{com}. label var region "地区分类 Region"
+{txt}
+{com}. label var fdi "外商直接投资(亿美元) FDI"
+{txt}
+{com}. label var ts_ratio "产业结构高级化指数 TS Ratio"
+{txt}
+{com}. label var tertiary_share "第三产业占比(%) Tertiary Share"
+{txt}
+{com}. label var secondary_share "第二产业占比(%) Secondary Share"
+{txt}
+{com}. label var pgdp "人均GDP(元) GDP per capita"
+{txt}
+{com}. label var human_cap "人力资本(年) Human Capital"
+{txt}
+{com}. label var gov_exp "政府支出占比(%) Gov Expenditure"
+{txt}
+{com}. label var openness "对外开放度(%) Openness"
+{txt}
+{com}. label var infra "基础设施 Infra"
+{txt}
+{com}. label var urban "城镇化率(%) Urbanization"
+{txt}
+{com}. 
+. disp "  变量标签设置完成"
+{res}  变量标签设置完成
+{txt}
+{com}. disp ""
+{res}
+{txt}
+{com}. 
+. * ---- 2. 数据清洗 ----
+. disp "=============================================================================="
+{res}==============================================================================
+{txt}
+{com}. disp "  Step 2: 数据清洗 / Data Cleaning"
+{res}  Step 2: 数据清洗 / Data Cleaning
+{txt}
+{com}. disp "=============================================================================="
+{res}==============================================================================
+{txt}
+{com}. disp ""
+{res}
+{txt}
+{com}. 
+. * 检查缺失值
+. disp "缺失值检查 / Missing values check:"
+{res}缺失值检查 / Missing values check:
+{txt}
+{com}. misstable summarize fdi ts_ratio pgdp human_cap gov_exp openness infra urban
+{txt}(variables nonmissing or string)
+
+{com}. disp ""
+{res}
+{txt}
+{com}. 
+. * 删除缺失值（如有）
+. drop if missing(fdi, ts_ratio, pgdp, human_cap, gov_exp, openness, infra, urban)
+{txt}(0 observations deleted)
+
+{com}. 
+. * 检查数据维度
+. disp "  清洗后数据维度 / Data dimensions after cleaning:"
+{res}  清洗后数据维度 / Data dimensions after cleaning:
+{txt}
+{com}. disp "  观测值数量 N = `=_N'"
+{res}  观测值数量 N = 403
+{txt}
+{com}. tabulate year
+
+  {txt}年份 Year {c |}      Freq.     Percent        Cum.
+{hline 12}{c +}{hline 35}
+       2010 {c |}{res}         31        7.69        7.69
+{txt}       2011 {c |}{res}         31        7.69       15.38
+{txt}       2012 {c |}{res}         31        7.69       23.08
+{txt}       2013 {c |}{res}         31        7.69       30.77
+{txt}       2014 {c |}{res}         31        7.69       38.46
+{txt}       2015 {c |}{res}         31        7.69       46.15
+{txt}       2016 {c |}{res}         31        7.69       53.85
+{txt}       2017 {c |}{res}         31        7.69       61.54
+{txt}       2018 {c |}{res}         31        7.69       69.23
+{txt}       2019 {c |}{res}         31        7.69       76.92
+{txt}       2020 {c |}{res}         31        7.69       84.62
+{txt}       2021 {c |}{res}         31        7.69       92.31
+{txt}       2022 {c |}{res}         31        7.69      100.00
+{txt}{hline 12}{c +}{hline 35}
+      Total {c |}{res}        403      100.00
+{txt}
+{com}. disp ""
+{res}
+{txt}
+{com}. 
+. * ---- 3. 变量构造 ----
+. disp "=============================================================================="
+{res}==============================================================================
+{txt}
+{com}. disp "  Step 3: 变量构造 / Variable Construction"
+{res}  Step 3: 变量构造 / Variable Construction
+{txt}
+{com}. disp "=============================================================================="
+{res}==============================================================================
+{txt}
+{com}. disp ""
+{res}
+{txt}
+{com}. 
+. * 生成对数变量（用于弹性分析）
+. gen ln_fdi = ln(fdi)
+{txt}
+{com}. gen ln_ts_ratio = ln(ts_ratio)
+{txt}
+{com}. gen ln_pgdp = ln(pgdp)
+{txt}
+{com}. gen ln_infra = ln(infra)
+{txt}
+{com}. 
+. label var ln_fdi "ln(FDI) 对数外商直接投资"
+{txt}
+{com}. label var ln_ts_ratio "ln(产业结构高级化指数)"
+{txt}
+{com}. label var ln_pgdp "ln(人均GDP)"
+{txt}
+{com}. label var ln_infra "ln(基础设施)"
+{txt}
+{com}. 
+. * 生成省份ID
+. encode province, gen(prov_id)
+{txt}
+{com}. label var prov_id "省份ID Province ID"
+{txt}
+{com}. 
+. * 设置面板数据结构
+. xtset prov_id year
+{res}
+{col 1}{txt:Panel variable: }{res:prov_id}{txt: (strongly balanced)}
+{p 1 16 2}{txt:Time variable: }{res:year}{txt:, }{res:{bind:2010}}{txt: to }{res:{bind:2022}}{p_end}
+{txt}{col 10}Delta: {res}1 unit
+{txt}
+{com}. disp "  面板数据结构已设置 / Panel data structure set"
+{res}  面板数据结构已设置 / Panel data structure set
+{txt}
+{com}. xtdescribe
+
+ {txt}prov_id:  {res}1{txt}, {res}2{txt}, ..., {res}31                                     {txt}n ={res}         31
+    {txt}year:  {res}2010, 2011, ..., 2022                             {txt}T ={res}         13
+           {txt}Delta(year) = {res}1 unit
+           {txt}Span(year)  = {res}13 periods
+           {txt}(prov_id*year uniquely identifies each observation)
+
+Distribution of T_i:   min      5%     25%       50%       75%     95%     max
+                    {res}    13      13      13        13        13      13      13
+
+{txt}{col 6}Freq.  Percent    Cum. {c |}  Pattern
+ {hline 27}{c +}{c -}{c -}{hline 13}
+{res}       31    100.00  100.00{txt} {c |}  {res}1111111111111
+{txt} {hline 27}{c +}{c -}{c -}{hline 13}
+{res}       31    100.00        {txt} {c |}  {res}XXXXXXXXXXXXX
+{txt}
+{com}. disp ""
+{res}
+{txt}
+{com}. 
+. * 保存清洗后的数据（DTA格式，供后续回归使用）
+. save "data/fdi_panel_data_clean.dta", replace
+{txt}{p 0 4 2}
+file {bf}
+data/fdi_panel_data_clean.dta{rm}
+saved
+{p_end}
+
+{com}. disp "  清洗后数据已保存 / Cleaned data saved: data/fdi_panel_data_clean.dta"
+{res}  清洗后数据已保存 / Cleaned data saved: data/fdi_panel_data_clean.dta
+{txt}
+{com}. 
+. * 同时导出CSV（方便查看）
+. outsheet province year region prov_id fdi ts_ratio tertiary_share secondary_share ///
+>     pgdp human_cap gov_exp openness infra urban ///
+>     ln_fdi ln_ts_ratio ln_pgdp ln_infra ///
+>     using "data/fdi_panel_data_clean.csv", comma replace
+{txt}
+{com}. disp "  CSV数据已保存 / CSV saved: data/fdi_panel_data_clean.csv"
+{res}  CSV数据已保存 / CSV saved: data/fdi_panel_data_clean.csv
+{txt}
+{com}. disp ""
+{res}
+{txt}
+{com}. 
+. * ---- 4. 描述性统计 ----
+. disp "=============================================================================="
+{res}==============================================================================
+{txt}
+{com}. disp "  Step 4: 描述性统计 / Descriptive Statistics"
+{res}  Step 4: 描述性统计 / Descriptive Statistics
+{txt}
+{com}. disp "=============================================================================="
+{res}==============================================================================
+{txt}
+{com}. disp ""
+{res}
+{txt}
+{com}. 
+. * 主要变量描述性统计
+. disp "主要变量描述性统计 / Main Variables Descriptive Statistics:"
+{res}主要变量描述性统计 / Main Variables Descriptive Statistics:
+{txt}
+{com}. summarize ts_ratio fdi pgdp human_cap gov_exp openness infra urban
+
+{txt}    Variable {c |}        Obs        Mean    Std. dev.       Min        Max
+{hline 13}{c +}{hline 57}
+{space 4}ts_ratio {c |}{res}        403    1.526589    .3694827      .8232      2.521
+{txt}{space 9}fdi {c |}{res}        403    261.3292    104.7431      88.83     551.26
+{txt}{space 8}pgdp {c |}{res}        403    94447.94     32119.5      38453     185072
+{txt}{space 3}human_cap {c |}{res}        403    10.18973    .8986937       8.51      12.15
+{txt}{space 5}gov_exp {c |}{res}        403    19.34667     3.20928      13.49      26.59
+{txt}{hline 13}{c +}{hline 57}
+{space 4}openness {c |}{res}        403     66.3962    21.71492       34.6     127.36
+{txt}{space 7}infra {c |}{res}        403    111.2062    33.54091      49.42     180.29
+{txt}{space 7}urban {c |}{res}        403     71.7903    13.22324      48.06         95
+{txt}
+{com}. 
+. * 输出描述性统计表（RTF格式，可用Word打开）
+. * 检查estout是否安装
+. capture which esttab
+{txt}
+{com}. if _rc != 0 {c -(}
+.     disp "正在安装 estout 包..."
+.     ssc install estout, replace
+. {c )-}
+{txt}
+{com}. 
+. estpost summarize ts_ratio fdi pgdp human_cap gov_exp openness infra urban
+
+{txt}{space 0}{space 0}{ralign 12:}{space 1}{c |}{space 1}{ralign 9:e(count)}{space 1}{space 1}{ralign 9:e(sum_w)}{space 1}{space 1}{ralign 9:e(mean)}{space 1}{space 1}{ralign 9:e(Var)}{space 1}{space 1}{ralign 9:e(sd)}{space 1}{space 1}{ralign 9:e(min)}{space 1}{space 1}{ralign 9:e(max)}{space 1}{space 1}{ralign 9:e(sum)}{space 1}
+{space 0}{hline 13}{c   +}{hline 11}{hline 11}{hline 11}{hline 11}{hline 11}{hline 11}{hline 11}{hline 11}
+{space 0}{space 0}{ralign 12:ts_ratio}{space 1}{c |}{space 1}{ralign 9:{res:{sf:      403}}}{space 1}{space 1}{ralign 9:{res:{sf:      403}}}{space 1}{space 1}{ralign 9:{res:{sf: 1.526589}}}{space 1}{space 1}{ralign 9:{res:{sf: .1365175}}}{space 1}{space 1}{ralign 9:{res:{sf: .3694827}}}{space 1}{space 1}{ralign 9:{res:{sf:    .8232}}}{space 1}{space 1}{ralign 9:{res:{sf:    2.521}}}{space 1}{space 1}{ralign 9:{res:{sf: 615.2154}}}{space 1}
+{space 0}{space 0}{ralign 12:fdi}{space 1}{c |}{space 1}{ralign 9:{res:{sf:      403}}}{space 1}{space 1}{ralign 9:{res:{sf:      403}}}{space 1}{space 1}{ralign 9:{res:{sf: 261.3292}}}{space 1}{space 1}{ralign 9:{res:{sf: 10971.11}}}{space 1}{space 1}{ralign 9:{res:{sf: 104.7431}}}{space 1}{space 1}{ralign 9:{res:{sf:    88.83}}}{space 1}{space 1}{ralign 9:{res:{sf:   551.26}}}{space 1}{space 1}{ralign 9:{res:{sf: 105315.7}}}{space 1}
+{space 0}{space 0}{ralign 12:pgdp}{space 1}{c |}{space 1}{ralign 9:{res:{sf:      403}}}{space 1}{space 1}{ralign 9:{res:{sf:      403}}}{space 1}{space 1}{ralign 9:{res:{sf: 94447.94}}}{space 1}{space 1}{ralign 9:{res:{sf: 1.03e+09}}}{space 1}{space 1}{ralign 9:{res:{sf:  32119.5}}}{space 1}{space 1}{ralign 9:{res:{sf:    38453}}}{space 1}{space 1}{ralign 9:{res:{sf:   185072}}}{space 1}{space 1}{ralign 9:{res:{sf: 3.81e+07}}}{space 1}
+{space 0}{space 0}{ralign 12:human_cap}{space 1}{c |}{space 1}{ralign 9:{res:{sf:      403}}}{space 1}{space 1}{ralign 9:{res:{sf:      403}}}{space 1}{space 1}{ralign 9:{res:{sf: 10.18973}}}{space 1}{space 1}{ralign 9:{res:{sf: .8076504}}}{space 1}{space 1}{ralign 9:{res:{sf: .8986937}}}{space 1}{space 1}{ralign 9:{res:{sf:     8.51}}}{space 1}{space 1}{ralign 9:{res:{sf:    12.15}}}{space 1}{space 1}{ralign 9:{res:{sf:  4106.46}}}{space 1}
+{space 0}{space 0}{ralign 12:gov_exp}{space 1}{c |}{space 1}{ralign 9:{res:{sf:      403}}}{space 1}{space 1}{ralign 9:{res:{sf:      403}}}{space 1}{space 1}{ralign 9:{res:{sf: 19.34667}}}{space 1}{space 1}{ralign 9:{res:{sf: 10.29948}}}{space 1}{space 1}{ralign 9:{res:{sf:  3.20928}}}{space 1}{space 1}{ralign 9:{res:{sf:    13.49}}}{space 1}{space 1}{ralign 9:{res:{sf:    26.59}}}{space 1}{space 1}{ralign 9:{res:{sf:  7796.71}}}{space 1}
+{space 0}{space 0}{ralign 12:openness}{space 1}{c |}{space 1}{ralign 9:{res:{sf:      403}}}{space 1}{space 1}{ralign 9:{res:{sf:      403}}}{space 1}{space 1}{ralign 9:{res:{sf:  66.3962}}}{space 1}{space 1}{ralign 9:{res:{sf: 471.5376}}}{space 1}{space 1}{ralign 9:{res:{sf: 21.71492}}}{space 1}{space 1}{ralign 9:{res:{sf:     34.6}}}{space 1}{space 1}{ralign 9:{res:{sf:   127.36}}}{space 1}{space 1}{ralign 9:{res:{sf: 26757.67}}}{space 1}
+{space 0}{space 0}{ralign 12:infra}{space 1}{c |}{space 1}{ralign 9:{res:{sf:      403}}}{space 1}{space 1}{ralign 9:{res:{sf:      403}}}{space 1}{space 1}{ralign 9:{res:{sf: 111.2062}}}{space 1}{space 1}{ralign 9:{res:{sf: 1124.993}}}{space 1}{space 1}{ralign 9:{res:{sf: 33.54091}}}{space 1}{space 1}{ralign 9:{res:{sf:    49.42}}}{space 1}{space 1}{ralign 9:{res:{sf:   180.29}}}{space 1}{space 1}{ralign 9:{res:{sf: 44816.08}}}{space 1}
+{space 0}{space 0}{ralign 12:urban}{space 1}{c |}{space 1}{ralign 9:{res:{sf:      403}}}{space 1}{space 1}{ralign 9:{res:{sf:      403}}}{space 1}{space 1}{ralign 9:{res:{sf:  71.7903}}}{space 1}{space 1}{ralign 9:{res:{sf:  174.854}}}{space 1}{space 1}{ralign 9:{res:{sf: 13.22324}}}{space 1}{space 1}{ralign 9:{res:{sf:    48.06}}}{space 1}{space 1}{ralign 9:{res:{sf:       95}}}{space 1}{space 1}{ralign 9:{res:{sf: 28931.49}}}{space 1}
+
+{com}. esttab using "output/tables/table1_descriptive_stats.rtf", ///
+>     cells("count mean sd min p50 max") ///
+>     title("表1 主要变量描述性统计") ///
+>     alignment(center) replace
+{res}{txt}(output written to {browse  `"output/tables/table1_descriptive_stats.rtf"'})
+
+{com}. disp "  描述性统计表已保存 / Descriptive stats table saved"
+{res}  描述性统计表已保存 / Descriptive stats table saved
+{txt}
+{com}. disp ""
+{res}
+{txt}
+{com}. 
+. * 分地区描述性统计
+. disp "分地区描述性统计 / By Region:"
+{res}分地区描述性统计 / By Region:
+{txt}
+{com}. tabstat ts_ratio fdi pgdp human_cap openness urban, by(region) stat(mean sd) format(%9.2f)
+
+{txt}Summary statistics: Mean, SD
+Group variable: region (地区分类 Region)
+
+{ralign 6:region} {...}
+{c |}{...}
+  ts_ratio       fdi      pgdp  human_~p  openness     urban
+{hline 7}{c +}{hline 60}
+{ralign 6:东部} {...}
+{c |}{...}
+ {res}     1.90    379.17 128521.80     11.23     92.35     87.50
+{txt}{space 6} {...}
+{c |}{...}
+ {res}     0.28     70.25  23941.65      0.43     11.80      5.42
+{txt}{hline 7}{c +}{hline 60}
+{ralign 6:中部} {...}
+{c |}{...}
+ {res}     1.42    223.78  87062.84      9.95     60.12     67.40
+{txt}{space 6} {...}
+{c |}{...}
+ {res}     0.21     47.29  15023.89      0.40      5.35      5.57
+{txt}{hline 7}{c +}{hline 60}
+{ralign 6:西部} {...}
+{c |}{...}
+ {res}     1.25    178.34  68136.97      9.39     46.79     60.32
+{txt}{space 6} {...}
+{c |}{...}
+ {res}     0.20     41.92  14002.73      0.37      6.45      5.74
+{txt}{hline 7}{c +}{hline 60}
+{ralign 6:Total} {...}
+{c |}{...}
+ {res}     1.53    261.33  94447.94     10.19     66.40     71.79
+{txt}{space 6} {...}
+{c |}{...}
+ {res}     0.37    104.74  32119.50      0.90     21.71     13.22
+{txt}{hline 7}{c BT}{hline 60}
+
+{com}. 
+. * 分地区统计表
+. estpost tabstat ts_ratio fdi pgdp human_cap gov_exp openness infra urban, by(region) statistics(mean) columns(statistics)
+
+{txt}Summary statistics: mean
+     for variables: ts_ratio fdi pgdp human_cap gov_exp openness infra urban
+  by categories of: region
+
+{space 0}{space 0}{ralign 12:region}{space 1}{c |}{space 1}{ralign 9:e(mean)}{space 1}
+{space 0}{hline 13}{c   +}{hline 11}
+{space 0}{res:{lalign 13:东部}}{c |}{space 11}
+{space 0}{space 0}{ralign 12:ts_ratio}{space 1}{c |}{space 1}{ralign 9:{res:{sf: 1.901338}}}{space 1}
+{space 0}{space 0}{ralign 12:fdi}{space 1}{c |}{space 1}{ralign 9:{res:{sf: 379.1722}}}{space 1}
+{space 0}{space 0}{ralign 12:pgdp}{space 1}{c |}{space 1}{ralign 9:{res:{sf: 128521.8}}}{space 1}
+{space 0}{space 0}{ralign 12:human_cap}{space 1}{c |}{space 1}{ralign 9:{res:{sf:  11.2342}}}{space 1}
+{space 0}{space 0}{ralign 12:gov_exp}{space 1}{c |}{space 1}{ralign 9:{res:{sf:    22.84}}}{space 1}
+{space 0}{space 0}{ralign 12:openness}{space 1}{c |}{space 1}{ralign 9:{res:{sf: 92.35042}}}{space 1}
+{space 0}{space 0}{ralign 12:infra}{space 1}{c |}{space 1}{ralign 9:{res:{sf: 150.4206}}}{space 1}
+{space 0}{space 0}{ralign 12:urban}{space 1}{c |}{space 1}{ralign 9:{res:{sf: 87.49888}}}{space 1}
+{space 0}{hline 13}{c   +}{hline 11}
+{space 0}{res:{lalign 13:中部}}{c |}{space 11}
+{space 0}{space 0}{ralign 12:ts_ratio}{space 1}{c |}{space 1}{ralign 9:{res:{sf: 1.419943}}}{space 1}
+{space 0}{space 0}{ralign 12:fdi}{space 1}{c |}{space 1}{ralign 9:{res:{sf: 223.7777}}}{space 1}
+{space 0}{space 0}{ralign 12:pgdp}{space 1}{c |}{space 1}{ralign 9:{res:{sf: 87062.84}}}{space 1}
+{space 0}{space 0}{ralign 12:human_cap}{space 1}{c |}{space 1}{ralign 9:{res:{sf: 9.945962}}}{space 1}
+{space 0}{space 0}{ralign 12:gov_exp}{space 1}{c |}{space 1}{ralign 9:{res:{sf: 18.14356}}}{space 1}
+{space 0}{space 0}{ralign 12:openness}{space 1}{c |}{space 1}{ralign 9:{res:{sf: 60.11731}}}{space 1}
+{space 0}{space 0}{ralign 12:infra}{space 1}{c |}{space 1}{ralign 9:{res:{sf: 101.6234}}}{space 1}
+{space 0}{space 0}{ralign 12:urban}{space 1}{c |}{space 1}{ralign 9:{res:{sf: 67.40298}}}{space 1}
+{space 0}{hline 13}{c   +}{hline 11}
+{space 0}{res:{lalign 13:西部}}{c |}{space 11}
+{space 0}{space 0}{ralign 12:ts_ratio}{space 1}{c |}{space 1}{ralign 9:{res:{sf: 1.254166}}}{space 1}
+{space 0}{space 0}{ralign 12:fdi}{space 1}{c |}{space 1}{ralign 9:{res:{sf: 178.3408}}}{space 1}
+{space 0}{space 0}{ralign 12:pgdp}{space 1}{c |}{space 1}{ralign 9:{res:{sf: 68136.97}}}{space 1}
+{space 0}{space 0}{ralign 12:human_cap}{space 1}{c |}{space 1}{ralign 9:{res:{sf: 9.394808}}}{space 1}
+{space 0}{space 0}{ralign 12:gov_exp}{space 1}{c |}{space 1}{ralign 9:{res:{sf: 16.94654}}}{space 1}
+{space 0}{space 0}{ralign 12:openness}{space 1}{c |}{space 1}{ralign 9:{res:{sf: 46.79077}}}{space 1}
+{space 0}{space 0}{ralign 12:infra}{space 1}{c |}{space 1}{ralign 9:{res:{sf: 81.64808}}}{space 1}
+{space 0}{space 0}{ralign 12:urban}{space 1}{c |}{space 1}{ralign 9:{res:{sf: 60.31564}}}{space 1}
+{space 0}{hline 13}{c   +}{hline 11}
+{space 0}{res:{lalign 13:Total}}{c |}{space 11}
+{space 0}{space 0}{ralign 12:ts_ratio}{space 1}{c |}{space 1}{ralign 9:{res:{sf: 1.526589}}}{space 1}
+{space 0}{space 0}{ralign 12:fdi}{space 1}{c |}{space 1}{ralign 9:{res:{sf: 261.3292}}}{space 1}
+{space 0}{space 0}{ralign 12:pgdp}{space 1}{c |}{space 1}{ralign 9:{res:{sf: 94447.94}}}{space 1}
+{space 0}{space 0}{ralign 12:human_cap}{space 1}{c |}{space 1}{ralign 9:{res:{sf: 10.18973}}}{space 1}
+{space 0}{space 0}{ralign 12:gov_exp}{space 1}{c |}{space 1}{ralign 9:{res:{sf: 19.34667}}}{space 1}
+{space 0}{space 0}{ralign 12:openness}{space 1}{c |}{space 1}{ralign 9:{res:{sf:  66.3962}}}{space 1}
+{space 0}{space 0}{ralign 12:infra}{space 1}{c |}{space 1}{ralign 9:{res:{sf: 111.2062}}}{space 1}
+{space 0}{space 0}{ralign 12:urban}{space 1}{c |}{space 1}{ralign 9:{res:{sf:  71.7903}}}{space 1}
+
+{com}. esttab using "output/tables/table1b_region_stats.rtf", ///
+>     cells("mean") ///
+>     title("表1b 分地区描述性统计") ///
+>     alignment(center) replace
+{res}{txt}{p 0 4 2}
+(file {bf}
+output/tables/table1b_region_stats.rtf{rm}
+not found)
+{p_end}
+{res}{txt}(output written to {browse  `"output/tables/table1b_region_stats.rtf"'})
+
+{com}. disp "  分地区统计表已保存 / Region stats table saved"
+{res}  分地区统计表已保存 / Region stats table saved
+{txt}
+{com}. disp ""
+{res}
+{txt}
+{com}. 
+. * ---- 5. 数据可视化 ----
+. disp "=============================================================================="
+{res}==============================================================================
+{txt}
+{com}. disp "  Step 5: 数据可视化 / Data Visualization"
+{res}  Step 5: 数据可视化 / Data Visualization
+{txt}
+{com}. disp "=============================================================================="
+{res}==============================================================================
+{txt}
+{com}. disp ""
+{res}
+{txt}
+{com}. 
+. * 图1：代表性省份产业结构高级化趋势
+. disp "图1：代表性省份产业结构高级化趋势"
+{res}图1：代表性省份产业结构高级化趋势
+{txt}
+{com}. preserve
+{txt}
+{com}.     local selected "广东 江苏 北京 四川 河南 甘肃"
+{txt}
+{com}.     local n : word count `selected'
+{txt}
+{com}.     local colors "navy maroon forest_green dkorange teal cranberry"
+{txt}
+{com}.     local i = 1
+{txt}
+{com}. 
+.     twoway (connected ts_ratio year if province == "广东", lcolor(navy) mcolor(navy) lwidth(medthick)) ///
+>            (connected ts_ratio year if province == "江苏", lcolor(maroon) mcolor(maroon) lwidth(medthick)) ///
+>            (connected ts_ratio year if province == "北京", lcolor(forest_green) mcolor(forest_green) lwidth(medthick)) ///
+>            (connected ts_ratio year if province == "四川", lcolor(dkorange) mcolor(dkorange) lwidth(medthick)) ///
+>            (connected ts_ratio year if province == "河南", lcolor(teal) mcolor(teal) lwidth(medthick)) ///
+>            (connected ts_ratio year if province == "甘肃", lcolor(cranberry) mcolor(cranberry) lwidth(medthick)), ///
+>            title("代表性省份产业结构高级化指数趋势(2010-2022)") ///
+>            xtitle("年份 Year") ///
+>            ytitle("产业结构高级化指数(三产/二产)") ///
+>            legend(order(1 "广东" 2 "江苏" 3 "北京" 4 "四川" 5 "河南" 6 "甘肃") rows(2) size(small)) ///
+>            scheme(s1color) graphregion(color(white))
+{res}{txt}
+{com}.     graph export "output/figures/fig1_ts_trend.png", replace width(2000)
+{txt}{p 0 4 2}
+file {bf}
+output/figures/fig1_ts_trend.png{rm}
+saved as
+PNG
+format
+{p_end}
+
+{com}. restore
+{txt}
+{com}. disp "  ✅ 图1已保存 / Fig 1 saved"
+{res}  ✅ 图1已保存 / Fig 1 saved
+{txt}
+{com}. disp ""
+{res}
+{txt}
+{com}. 
+. * 图2：FDI与产业结构散点图
+. disp "图2：FDI与产业结构散点图"
+{res}图2：FDI与产业结构散点图
+{txt}
+{com}. twoway (scatter ts_ratio fdi if region == "东部", mcolor(navy%50) msize(small)) ///
+>        (scatter ts_ratio fdi if region == "中部", mcolor(maroon%50) msize(small)) ///
+>        (scatter ts_ratio fdi if region == "西部", mcolor(forest_green%50) msize(small)) ///
+>        (lfit ts_ratio fdi, lcolor(black) lwidth(medthick) lpattern(dash)), ///
+>        title("FDI与产业结构高级化散点图") ///
+>        xtitle("FDI(亿美元)") ///
+>        ytitle("产业结构高级化指数") ///
+>        legend(order(1 "东部" 2 "中部" 3 "西部" 4 "拟合线") rows(2) size(small)) ///
+>        scheme(s1color) graphregion(color(white))
+{res}{txt}
+{com}. graph export "output/figures/fig2_fdi_ts_scatter.png", replace width(2000)
+{txt}{p 0 4 2}
+file {bf}
+output/figures/fig2_fdi_ts_scatter.png{rm}
+saved as
+PNG
+format
+{p_end}
+
+{com}. disp "  ✅ 图2已保存 / Fig 2 saved"
+{res}  ✅ 图2已保存 / Fig 2 saved
+{txt}
+{com}. disp ""
+{res}
+{txt}
+{com}. 
+. * 图3：三大区域平均FDI趋势
+. disp "图3：三大区域平均FDI趋势"
+{res}图3：三大区域平均FDI趋势
+{txt}
+{com}. preserve
+{txt}
+{com}.     collapse (mean) fdi, by(year region)
+{res}{txt}
+{com}.     twoway (connected fdi year if region == "东部", lcolor(navy) mcolor(navy) lwidth(medthick)) ///
+>            (connected fdi year if region == "中部", lcolor(maroon) mcolor(maroon) lwidth(medthick)) ///
+>            (connected fdi year if region == "西部", lcolor(forest_green) mcolor(forest_green) lwidth(medthick)), ///
+>            title("三大区域FDI平均水平变化趋势(2010-2022)") ///
+>            xtitle("年份 Year") ///
+>            ytitle("平均FDI(亿美元)") ///
+>            legend(order(1 "东部" 2 "中部" 3 "西部") rows(1) size(small)) ///
+>            scheme(s1color) graphregion(color(white))
+{res}{txt}
+{com}.     graph export "output/figures/fig3_fdi_region_trend.png", replace width(2000)
+{txt}{p 0 4 2}
+file {bf}
+output/figures/fig3_fdi_region_trend.png{rm}
+saved as
+PNG
+format
+{p_end}
+
+{com}. restore
+{txt}
+{com}. disp "  ✅ 图3已保存 / Fig 3 saved"
+{res}  ✅ 图3已保存 / Fig 3 saved
+{txt}
+{com}. disp ""
+{res}
+{txt}
+{com}. 
+. * 图4：全国平均FDI与产业结构双轴图
+. disp "图4：全国平均FDI与产业结构双轴图"
+{res}图4：全国平均FDI与产业结构双轴图
+{txt}
+{com}. preserve
+{txt}
+{com}.     collapse (mean) fdi ts_ratio, by(year)
+{res}{txt}
+{com}.     twoway (bar fdi year, barwidth(0.6) color(navy%60) yaxis(1)) ///
+>            (connected ts_ratio year, lcolor(cranberry) mcolor(cranberry) lwidth(medthick) yaxis(2)), ///
+>            title("全国平均FDI与产业结构高级化指数变化") ///
+>            xtitle("年份 Year") ///
+>            ytitle("平均FDI(亿美元)", axis(1) color(navy)) ///
+>            ytitle("产业结构高级化指数", axis(2) color(cranberry)) ///
+>            legend(order(1 "FDI(左轴)" 2 "产业结构指数(右轴)") rows(1) size(small)) ///
+>            scheme(s1color) graphregion(color(white))
+{res}{txt}
+{com}.     graph export "output/figures/fig4_fdi_ts_dual.png", replace width(2000)
+{txt}{p 0 4 2}
+file {bf}
+output/figures/fig4_fdi_ts_dual.png{rm}
+saved as
+PNG
+format
+{p_end}
+
+{com}. restore
+{txt}
+{com}. disp "  ✅ 图4已保存 / Fig 4 saved"
+{res}  ✅ 图4已保存 / Fig 4 saved
+{txt}
+{com}. disp ""
+{res}
+{txt}
+{com}. 
+. * 图5：第三产业占比地区分布箱线图
+. disp "图5：第三产业占比地区分布箱线图"
+{res}图5：第三产业占比地区分布箱线图
+{txt}
+{com}. graph box tertiary_share, over(region) ///
+>     title("三大区域第三产业占GDP比重分布") ///
+>     ytitle("第三产业占比(%)") ///
+>     scheme(s1color) graphregion(color(white))
+{res}{txt}
+{com}. graph export "output/figures/fig5_tertiary_boxplot.png", replace width(2000)
+{txt}{p 0 4 2}
+file {bf}
+output/figures/fig5_tertiary_boxplot.png{rm}
+saved as
+PNG
+format
+{p_end}
+
+{com}. disp "  ✅ 图5已保存 / Fig 5 saved"
+{res}  ✅ 图5已保存 / Fig 5 saved
+{txt}
+{com}. disp ""
+{res}
+{txt}
+{com}. 
+. * ---- 6. 结果汇总 ----
+. disp "=============================================================================="
+{res}==============================================================================
+{txt}
+{com}. disp "  🎉 数据准备与可视化完成！纯Stata实现"
+{res}  🎉 数据准备与可视化完成！纯Stata实现
+{txt}
+{com}. disp "  Data preparation & visualization completed! Pure Stata"
+{res}  Data preparation & visualization completed! Pure Stata
+{txt}
+{com}. disp "=============================================================================="
+{res}==============================================================================
+{txt}
+{com}. disp ""
+{res}
+{txt}
+{com}. disp "📁 输出文件清单 / Output Files:"
+{res}📁 输出文件清单 / Output Files:
+{txt}
+{com}. disp ""
+{res}
+{txt}
+{com}. disp "  数据文件 / Data:"
+{res}  数据文件 / Data:
+{txt}
+{com}. disp "    - data/fdi_panel_data_raw.csv       原始面板数据"
+{res}    - data/fdi_panel_data_raw.csv       原始面板数据
+{txt}
+{com}. disp "    - data/fdi_panel_data_clean.dta     清洗后数据(Stata格式)"
+{res}    - data/fdi_panel_data_clean.dta     清洗后数据(Stata格式)
+{txt}
+{com}. disp "    - data/fdi_panel_data_clean.csv     清洗后数据(CSV格式)"
+{res}    - data/fdi_panel_data_clean.csv     清洗后数据(CSV格式)
+{txt}
+{com}. disp ""
+{res}
+{txt}
+{com}. disp "  表格 / Tables:"
+{res}  表格 / Tables:
+{txt}
+{com}. disp "    - output/tables/table1_descriptive_stats.rtf   描述性统计"
+{res}    - output/tables/table1_descriptive_stats.rtf   描述性统计
+{txt}
+{com}. disp "    - output/tables/table1b_region_stats.rtf       分地区统计"
+{res}    - output/tables/table1b_region_stats.rtf       分地区统计
+{txt}
+{com}. disp ""
+{res}
+{txt}
+{com}. disp "  图表 / Figures:"
+{res}  图表 / Figures:
+{txt}
+{com}. disp "    - output/figures/fig1_ts_trend.png         产业结构趋势图"
+{res}    - output/figures/fig1_ts_trend.png         产业结构趋势图
+{txt}
+{com}. disp "    - output/figures/fig2_fdi_ts_scatter.png   FDI散点图"
+{res}    - output/figures/fig2_fdi_ts_scatter.png   FDI散点图
+{txt}
+{com}. disp "    - output/figures/fig3_fdi_region_trend.png 分地区FDI趋势"
+{res}    - output/figures/fig3_fdi_region_trend.png 分地区FDI趋势
+{txt}
+{com}. disp "    - output/figures/fig4_fdi_ts_dual.png      FDI与产业结构双轴图"
+{res}    - output/figures/fig4_fdi_ts_dual.png      FDI与产业结构双轴图
+{txt}
+{com}. disp "    - output/figures/fig5_tertiary_boxplot.png 三产占比箱线图"
+{res}    - output/figures/fig5_tertiary_boxplot.png 三产占比箱线图
+{txt}
+{com}. disp ""
+{res}
+{txt}
+{com}. disp "🚀 下一步：运行 02_panel_regression.do 进行面板回归分析"
+{res}🚀 下一步：运行 02_panel_regression.do 进行面板回归分析
+{txt}
+{com}. disp "   Next step: Run 02_panel_regression.do for panel regression"
+{res}   Next step: Run 02_panel_regression.do for panel regression
+{txt}
+{com}. disp ""
+{res}
+{txt}
+{com}. 
+. log close
+      {txt}name:  {res}<unnamed>
+       {txt}log:  {res}C:\Users\33841\Desktop\project2_fdi_industry\output/data_prep_log.smcl
+  {txt}log type:  {res}smcl
+ {txt}closed on:  {res}27 Sep 2026, 23:30:27
+{txt}{.-}
+{smcl}
+{txt}{sf}{ul off}
