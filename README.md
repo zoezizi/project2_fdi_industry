@@ -133,5 +133,5 @@ do code/02_panel_regression.do
 
 ### 👤 作者 / Author
 
-上海对外经贸大学 · 国际商务专业硕士  
-Shanghai University of International Business and Economics · Master of International Business
+上海对外经贸大学 · 国际商务专业硕士 · 晏孜 
+Shanghai University of International Business and Economics · Master of International Business · YanZi
